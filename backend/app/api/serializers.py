@@ -24,7 +24,9 @@ def incident_summary(i: Incident) -> dict:
     return {"id": i.id, "title": i.title, "category": i.category, "status": i.status, "severity": i.severity,
             "services": i.services, "event_count": i.event_count, "error_count": i.error_count,
             "window_start": iso(i.window_start), "window_end": iso(i.window_end), "created_at": iso(i.created_at),
-            "top_candidate": {"service": top.service, "error_type": top.error_type, "score": top.score}
+            "top_candidate": {"service": top.service, "error_type": top.error_type, "score": top.score,
+                              "confidence": top.confidence,
+                              "confidence_label": (top.confidence_detail or {}).get("label")}
             if top else None,
             "has_recommendation": bool(i.recommendations)}
 
@@ -32,6 +34,7 @@ def incident_summary(i: Incident) -> dict:
 def candidate_out(c: Candidate) -> dict:
     return {"id": c.id, "rank": c.rank, "service": c.service, "fingerprint": c.fingerprint,
             "error_type": c.error_type, "message": c.message, "score": c.score, "signals": c.signals,
+            "confidence": c.confidence, "confidence_detail": c.confidence_detail,
             "reasons": c.reasons, "event_ids": c.event_ids[:50], "first_seen": iso(c.first_seen), "count": c.count,
             "code_location": c.code_location, "deployment_id": c.deployment_id, "known_error_id": c.known_error_id,
             "verdict": c.verdict}

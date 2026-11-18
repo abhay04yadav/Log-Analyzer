@@ -1,0 +1,257 @@
+{"timestamp": "2026-11-10T09:00:00.004Z", "level": "INFO", "service": "cart-service", "message": "Cart loaded", "trace_id": "d1e62411f5f14c309cf49667d38ebe8a", "span_id": "81b557a61f4a40ec", "parent_span_id": "51e9aba9a4654ba8", "logger": "cart.cache", "peer_service": "redis"}
+2026-11-10T09:00:00.009Z INFO [api-gateway] GET /api/cart 200 9ms trace_id=d1e62411f5f14c309cf49667d38ebe8a span_id=51e9aba9a4654ba8
+{"timestamp": "2026-11-10T09:00:00.814Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user kavya from 10.0.1.20", "logger": "auth.login", "event": "auth_success", "username": "kavya", "client_ip": "10.0.1.20"}
+{"timestamp": "2026-11-10T09:00:01.250Z", "level": "INFO", "service": "payment-service", "message": "Card charged", "trace_id": "e6d52edf6f5f42b48b827f59071a1058", "span_id": "c2958f99568a49bd", "parent_span_id": "02e85ba7b3c44964", "logger": "payment.api", "amount": 72.26}
+ts=2026-11-10T09:00:01.419Z level=info service=checkout-service trace_id=e6d52edf6f5f42b48b827f59071a1058 span_id=02e85ba7b3c44964 parent_span_id=4061c326e7164956 order_id="ORD-21265" msg="Order placed"
+2026-11-10T09:00:01.439Z INFO [api-gateway] POST /api/checkout 200 219ms trace_id=e6d52edf6f5f42b48b827f59071a1058 span_id=4061c326e7164956
+{"timestamp": "2026-11-10T09:00:01.818Z", "level": "INFO", "service": "payment-service", "message": "Card charged", "trace_id": "ab0c4c7148004e62b53c3866af157177", "span_id": "db30fc7f79474dbb", "parent_span_id": "31130776dbdf4086", "logger": "payment.api", "amount": 36.31}
+ts=2026-11-10T09:00:01.919Z level=info service=checkout-service trace_id=ab0c4c7148004e62b53c3866af157177 span_id=31130776dbdf4086 parent_span_id=47f18d3c5bdf49a4 order_id="ORD-65642" msg="Order placed"
+2026-11-10T09:00:01.939Z INFO [api-gateway] POST /api/checkout 200 151ms trace_id=ab0c4c7148004e62b53c3866af157177 span_id=47f18d3c5bdf49a4
+{"timestamp": "2026-11-10T09:00:02.206Z", "level": "INFO", "service": "payment-service", "message": "Card charged", "trace_id": "ba867bc00ef7463dacfb36b96dea6f49", "span_id": "912bb94e81534729", "parent_span_id": "288fcc0b026c47b6", "logger": "payment.api", "amount": 192.88}
+ts=2026-11-10T09:00:02.303Z level=info service=checkout-service trace_id=ba867bc00ef7463dacfb36b96dea6f49 span_id=288fcc0b026c47b6 parent_span_id=18ff25346e8f4bd1 order_id="ORD-86414" msg="Order placed"
+2026-11-10T09:00:02.323Z INFO [api-gateway] POST /api/checkout 200 147ms trace_id=ba867bc00ef7463dacfb36b96dea6f49 span_id=18ff25346e8f4bd1
+{"timestamp": "2026-11-10T09:00:02.991Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user priya from 10.0.1.58", "logger": "auth.login", "event": "auth_success", "username": "priya", "client_ip": "10.0.1.58"}
+2026-11-10T09:00:03.633Z INFO [inventory-service] c.s.i.StockService - Reserved 1 x SKU-1296 trace_id=4c65eff9f9a04db1bce785b4a568ef6b span_id=e1513dbc5a3c49c6 parent_span_id=f06f8651b3bf4c4c
+{"timestamp": "2026-11-10T09:00:03.658Z", "level": "INFO", "service": "order-service", "message": "Order created", "trace_id": "4c65eff9f9a04db1bce785b4a568ef6b", "span_id": "f06f8651b3bf4c4c", "parent_span_id": "843ecbae159647ce", "logger": "orders.service"}
+2026-11-10T09:00:03.673Z INFO [api-gateway] POST /api/orders 201 55ms trace_id=4c65eff9f9a04db1bce785b4a568ef6b span_id=843ecbae159647ce
+2026-11-10T09:00:04.000Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=e91b09c304384a52a7d8e86446b629d0 span_id=6653248797d74331 parent_span_id=e94dc34d2b1841e1
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:04.009Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1104", "trace_id": "e91b09c304384a52a7d8e86446b629d0", "span_id": "e94dc34d2b1841e1", "parent_span_id": "4cccd19085094659", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1104", "region": "ap-south-2"}
+2026-11-10T09:00:04.014Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=e91b09c304384a52a7d8e86446b629d0 span_id=4cccd19085094659
+{"timestamp": "2026-11-10T09:00:04.209Z", "level": "INFO", "service": "payment-service", "message": "Card charged", "trace_id": "11aeba80cae24817ad2ed0efc3df4c6e", "span_id": "37abaf32254d433c", "parent_span_id": "10813f26f9fe4922", "logger": "payment.api", "amount": 99.46}
+ts=2026-11-10T09:00:04.395Z level=info service=checkout-service trace_id=11aeba80cae24817ad2ed0efc3df4c6e span_id=10813f26f9fe4922 parent_span_id=319f98e3881d4f2d order_id="ORD-99391" msg="Order placed"
+2026-11-10T09:00:04.415Z INFO [api-gateway] POST /api/checkout 200 236ms trace_id=11aeba80cae24817ad2ed0efc3df4c6e span_id=319f98e3881d4f2d
+2026-11-10T09:00:04.500Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=253119abaa6e4aa789901c215947f9f1 span_id=a70fb9e1d2ba48b0 parent_span_id=3540496f00e142f0
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:04.509Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1154", "trace_id": "253119abaa6e4aa789901c215947f9f1", "span_id": "3540496f00e142f0", "parent_span_id": "5e9a94fde7904e00", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1154", "region": "ap-south-2"}
+2026-11-10T09:00:04.514Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=253119abaa6e4aa789901c215947f9f1 span_id=5e9a94fde7904e00
+2026-11-10T09:00:04.641Z INFO [inventory-service] c.s.i.StockService - Reserved 1 x SKU-1381 trace_id=a89d04da8bb7422e901c02b24e2f5066 span_id=d9d697954ecb4672 parent_span_id=dd53115cff23467d
+{"timestamp": "2026-11-10T09:00:04.666Z", "level": "INFO", "service": "order-service", "message": "Order created", "trace_id": "a89d04da8bb7422e901c02b24e2f5066", "span_id": "dd53115cff23467d", "parent_span_id": "31cd8acc4e734d99", "logger": "orders.service"}
+2026-11-10T09:00:04.681Z INFO [api-gateway] POST /api/orders 201 55ms trace_id=a89d04da8bb7422e901c02b24e2f5066 span_id=31cd8acc4e734d99
+{"timestamp": "2026-11-10T09:00:05.063Z", "level": "INFO", "service": "payment-service", "message": "Card charged", "trace_id": "d5379b1b99914d72aaae6e28a907b9b6", "span_id": "5907b5b8c2cd4228", "parent_span_id": "53ec79f45f2748a5", "logger": "payment.api", "amount": 27.28}
+ts=2026-11-10T09:00:05.247Z level=info service=checkout-service trace_id=d5379b1b99914d72aaae6e28a907b9b6 span_id=53ec79f45f2748a5 parent_span_id=ebdae2fdb44343c6 order_id="ORD-36995" msg="Order placed"
+2026-11-10T09:00:05.267Z INFO [api-gateway] POST /api/checkout 200 234ms trace_id=d5379b1b99914d72aaae6e28a907b9b6 span_id=ebdae2fdb44343c6
+2026-11-10T09:00:05.322Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=e6325f43e3354c53b481dbb2ea2e1172 span_id=f238d2aef2224bb5 parent_span_id=912f3febf29f430e
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:05.331Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1971", "trace_id": "e6325f43e3354c53b481dbb2ea2e1172", "span_id": "912f3febf29f430e", "parent_span_id": "c2e7a66e847344a2", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1971", "region": "ap-south-2"}
+2026-11-10T09:00:05.336Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=e6325f43e3354c53b481dbb2ea2e1172 span_id=c2e7a66e847344a2
+{"timestamp": "2026-11-10T09:00:05.631Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user kavya from 10.0.6.121", "logger": "auth.login", "event": "auth_success", "username": "kavya", "client_ip": "10.0.6.121"}
+2026-11-10T09:00:06.040Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=8afe7e3eb6cf49e48a4e344d83d999dd span_id=cfcdd2fedd574eb2 parent_span_id=367868c6887c4836
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:06.049Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1026", "trace_id": "8afe7e3eb6cf49e48a4e344d83d999dd", "span_id": "367868c6887c4836", "parent_span_id": "f5b61f42b6074f7c", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1026", "region": "ap-south-2"}
+2026-11-10T09:00:06.054Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=8afe7e3eb6cf49e48a4e344d83d999dd span_id=f5b61f42b6074f7c
+{"timestamp": "2026-11-10T09:00:06.439Z", "level": "INFO", "service": "cart-service", "message": "Cart loaded", "trace_id": "c7b435684aac4416ae8fe8fbcf794d67", "span_id": "5d6372eb570841d8", "parent_span_id": "6a87d41236fb47f1", "logger": "cart.cache", "peer_service": "redis"}
+2026-11-10T09:00:06.444Z INFO [api-gateway] GET /api/cart 200 9ms trace_id=c7b435684aac4416ae8fe8fbcf794d67 span_id=6a87d41236fb47f1
+2026-11-10T09:00:06.582Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=056447d803044b9e886b2618d98bba46 span_id=f73f6f9e0ba04305 parent_span_id=fb772afa8b294044
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:06.591Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1212", "trace_id": "056447d803044b9e886b2618d98bba46", "span_id": "fb772afa8b294044", "parent_span_id": "9a80963eba7e48fe", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1212", "region": "ap-south-2"}
+2026-11-10T09:00:06.596Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=056447d803044b9e886b2618d98bba46 span_id=9a80963eba7e48fe
+2026-11-10T09:00:06.953Z INFO [inventory-service] c.s.i.StockService - Reserved 1 x SKU-1715 trace_id=85e75ab504f24aa991aeb0c012189961 span_id=b30e9519d97f4ee9 parent_span_id=482136d1602f4791
+{"timestamp": "2026-11-10T09:00:06.978Z", "level": "INFO", "service": "order-service", "message": "Order created", "trace_id": "85e75ab504f24aa991aeb0c012189961", "span_id": "482136d1602f4791", "parent_span_id": "1e889b9042d74586", "logger": "orders.service"}
+2026-11-10T09:00:06.993Z INFO [api-gateway] POST /api/orders 201 55ms trace_id=85e75ab504f24aa991aeb0c012189961 span_id=1e889b9042d74586
+2026-11-10T09:00:07.450Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=66deb517d5a244159189cc1a81c629e7 span_id=e6a18465575e4e7a parent_span_id=e3a4e8bdd414443f
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:07.459Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1152", "trace_id": "66deb517d5a244159189cc1a81c629e7", "span_id": "e3a4e8bdd414443f", "parent_span_id": "bb1c5db4a47e40d6", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1152", "region": "ap-south-2"}
+2026-11-10T09:00:07.464Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=66deb517d5a244159189cc1a81c629e7 span_id=bb1c5db4a47e40d6
+{"timestamp": "2026-11-10T09:00:07.703Z", "level": "INFO", "service": "payment-service", "message": "Card charged", "trace_id": "da4f048c74ff4a2b81f54baec269048e", "span_id": "8678bebaf4cb4bed", "parent_span_id": "c4bca3d7ef304c76", "logger": "payment.api", "amount": 97.07}
+ts=2026-11-10T09:00:07.890Z level=info service=checkout-service trace_id=da4f048c74ff4a2b81f54baec269048e span_id=c4bca3d7ef304c76 parent_span_id=163108f4d9b1450c order_id="ORD-74895" msg="Order placed"
+2026-11-10T09:00:07.910Z INFO [api-gateway] POST /api/checkout 200 237ms trace_id=da4f048c74ff4a2b81f54baec269048e span_id=163108f4d9b1450c
+2026-11-10T09:00:08.331Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=5a2bde742b0f4228816f0babc54fcf60 span_id=96835f7740984aef parent_span_id=40c9d464f2a94318
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:08.340Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1978", "trace_id": "5a2bde742b0f4228816f0babc54fcf60", "span_id": "40c9d464f2a94318", "parent_span_id": "4cf3187948a04aad", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1978", "region": "ap-south-2"}
+2026-11-10T09:00:08.345Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=5a2bde742b0f4228816f0babc54fcf60 span_id=4cf3187948a04aad
+{"timestamp": "2026-11-10T09:00:08.453Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user priya from 10.0.5.157", "logger": "auth.login", "event": "auth_success", "username": "priya", "client_ip": "10.0.5.157"}
+{"timestamp": "2026-11-10T09:00:08.869Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user neha from 10.0.3.195", "logger": "auth.login", "event": "auth_success", "username": "neha", "client_ip": "10.0.3.195"}
+2026-11-10T09:00:09.039Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=4689aeb288474583991b0694c92597a2 span_id=38a25f83d2694f42 parent_span_id=4880f4fbeeb3412a
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:09.048Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1372", "trace_id": "4689aeb288474583991b0694c92597a2", "span_id": "4880f4fbeeb3412a", "parent_span_id": "461dafd152464004", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1372", "region": "ap-south-2"}
+2026-11-10T09:00:09.053Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=4689aeb288474583991b0694c92597a2 span_id=461dafd152464004
+{"timestamp": "2026-11-10T09:00:09.302Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user priya from 10.0.7.12", "logger": "auth.login", "event": "auth_success", "username": "priya", "client_ip": "10.0.7.12"}
+2026-11-10T09:00:09.824Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=57a6414272e9423b8935d366c51672aa span_id=68f228531f68495f parent_span_id=0161481197f64164
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:09.833Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1118", "trace_id": "57a6414272e9423b8935d366c51672aa", "span_id": "0161481197f64164", "parent_span_id": "f6f2123654aa485e", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1118", "region": "ap-south-2"}
+2026-11-10T09:00:09.838Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=57a6414272e9423b8935d366c51672aa span_id=f6f2123654aa485e
+{"timestamp": "2026-11-10T09:00:10.033Z", "level": "INFO", "service": "cart-service", "message": "Cart loaded", "trace_id": "81b0cdcecac44e42aa1883381a1d5a76", "span_id": "035a03dd9e8b4f4e", "parent_span_id": "3f26566c4de04577", "logger": "cart.cache", "peer_service": "redis"}
+2026-11-10T09:00:10.038Z INFO [api-gateway] GET /api/cart 200 9ms trace_id=81b0cdcecac44e42aa1883381a1d5a76 span_id=3f26566c4de04577
+{"timestamp": "2026-11-10T09:00:10.557Z", "level": "INFO", "service": "cart-service", "message": "Cart loaded", "trace_id": "a860bc42c879439892f041d982b67e51", "span_id": "ea4a47f15860472e", "parent_span_id": "44e37ded211746b5", "logger": "cart.cache", "peer_service": "redis"}
+2026-11-10T09:00:10.562Z INFO [api-gateway] GET /api/cart 200 9ms trace_id=a860bc42c879439892f041d982b67e51 span_id=44e37ded211746b5
+2026-11-10T09:00:10.833Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=741cab0d00374a01aa352c17f8493d2a span_id=c303bb05697a4b5e parent_span_id=e208bf31a30541a9
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:10.842Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1477", "trace_id": "741cab0d00374a01aa352c17f8493d2a", "span_id": "e208bf31a30541a9", "parent_span_id": "44390c20e5d54eb8", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1477", "region": "ap-south-2"}
+2026-11-10T09:00:10.847Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=741cab0d00374a01aa352c17f8493d2a span_id=44390c20e5d54eb8
+{"timestamp": "2026-11-10T09:00:11.198Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user priya from 10.0.2.217", "logger": "auth.login", "event": "auth_success", "username": "priya", "client_ip": "10.0.2.217"}
+2026-11-10T09:00:11.622Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=8056afde82d844139dfc9aed5751f5c0 span_id=5dce87b5fc8f4c67 parent_span_id=6bfb5dbc421e4a3b
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:11.631Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1319", "trace_id": "8056afde82d844139dfc9aed5751f5c0", "span_id": "6bfb5dbc421e4a3b", "parent_span_id": "c54803ec885645f2", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1319", "region": "ap-south-2"}
+2026-11-10T09:00:11.636Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=8056afde82d844139dfc9aed5751f5c0 span_id=c54803ec885645f2
+{"timestamp": "2026-11-10T09:00:12.011Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user neha from 10.0.2.17", "logger": "auth.login", "event": "auth_success", "username": "neha", "client_ip": "10.0.2.17"}
+2026-11-10T09:00:12.173Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=657c7e9b444f4a7c979caf927ba13be0 span_id=7178c6782d764911 parent_span_id=2856d6bb38ca4404
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:12.182Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1104", "trace_id": "657c7e9b444f4a7c979caf927ba13be0", "span_id": "2856d6bb38ca4404", "parent_span_id": "f53f3d7ceb084772", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1104", "region": "ap-south-2"}
+2026-11-10T09:00:12.187Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=657c7e9b444f4a7c979caf927ba13be0 span_id=f53f3d7ceb084772
+{"timestamp": "2026-11-10T09:00:12.682Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user arjun from 10.0.5.185", "logger": "auth.login", "event": "auth_success", "username": "arjun", "client_ip": "10.0.5.185"}
+2026-11-10T09:00:13.123Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=de42f52eeb9b46e08e9b9494de7dc11e span_id=d420ca926dd74817 parent_span_id=dd9bfd031bc24743
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:13.132Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1758", "trace_id": "de42f52eeb9b46e08e9b9494de7dc11e", "span_id": "dd9bfd031bc24743", "parent_span_id": "09a8e16400384146", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1758", "region": "ap-south-2"}
+2026-11-10T09:00:13.137Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=de42f52eeb9b46e08e9b9494de7dc11e span_id=09a8e16400384146
+{"timestamp": "2026-11-10T09:00:13.472Z", "level": "INFO", "service": "cart-service", "message": "Cart loaded", "trace_id": "9c615e0e1c524161bad9a47859b28803", "span_id": "7730721e52da405b", "parent_span_id": "04d4d25595be4c6c", "logger": "cart.cache", "peer_service": "redis"}
+2026-11-10T09:00:13.477Z INFO [api-gateway] GET /api/cart 200 9ms trace_id=9c615e0e1c524161bad9a47859b28803 span_id=04d4d25595be4c6c
+2026-11-10T09:00:13.782Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=6963720072174f50bbd8b3069bbeb45e span_id=cd8e573f5497435b parent_span_id=d33fc65e7c2c4197
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:13.791Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1848", "trace_id": "6963720072174f50bbd8b3069bbeb45e", "span_id": "d33fc65e7c2c4197", "parent_span_id": "1703e849125a4b8e", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1848", "region": "ap-south-2"}
+2026-11-10T09:00:13.796Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=6963720072174f50bbd8b3069bbeb45e span_id=1703e849125a4b8e
+{"timestamp": "2026-11-10T09:00:13.839Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user kavya from 10.0.6.45", "logger": "auth.login", "event": "auth_success", "username": "kavya", "client_ip": "10.0.6.45"}
+{"timestamp": "2026-11-10T09:00:14.285Z", "level": "INFO", "service": "payment-service", "message": "Card charged", "trace_id": "cd8a5c9baf694c74adfa05d6ca667a40", "span_id": "e0848e9ae11d4e93", "parent_span_id": "6f153a976ad94769", "logger": "payment.api", "amount": 232.79}
+ts=2026-11-10T09:00:14.380Z level=info service=checkout-service trace_id=cd8a5c9baf694c74adfa05d6ca667a40 span_id=6f153a976ad94769 parent_span_id=6ddb008c56424d5b order_id="ORD-26952" msg="Order placed"
+2026-11-10T09:00:14.400Z INFO [api-gateway] POST /api/checkout 200 145ms trace_id=cd8a5c9baf694c74adfa05d6ca667a40 span_id=6ddb008c56424d5b
+2026-11-10T09:00:14.697Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=93da63314e4a44a297825c4ca9550b1b span_id=618df0dd1acf4d78 parent_span_id=c6883356d8e34b00
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:14.706Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1528", "trace_id": "93da63314e4a44a297825c4ca9550b1b", "span_id": "c6883356d8e34b00", "parent_span_id": "c0f56f3013224630", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1528", "region": "ap-south-2"}
+2026-11-10T09:00:14.711Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=93da63314e4a44a297825c4ca9550b1b span_id=c0f56f3013224630
+{"timestamp": "2026-11-10T09:00:14.969Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user arjun from 10.0.7.236", "logger": "auth.login", "event": "auth_success", "username": "arjun", "client_ip": "10.0.7.236"}
+2026-11-10T09:00:15.211Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=9a554c2b6bbd41e89eb5ddd243bac8d1 span_id=41f8fe36b874495d parent_span_id=e6df9d4e8a2641ac
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:15.220Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1973", "trace_id": "9a554c2b6bbd41e89eb5ddd243bac8d1", "span_id": "e6df9d4e8a2641ac", "parent_span_id": "52312bf1b5744fb2", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1973", "region": "ap-south-2"}
+2026-11-10T09:00:15.225Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=9a554c2b6bbd41e89eb5ddd243bac8d1 span_id=52312bf1b5744fb2
+{"timestamp": "2026-11-10T09:00:15.368Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user neha from 10.0.7.142", "logger": "auth.login", "event": "auth_success", "username": "neha", "client_ip": "10.0.7.142"}
+{"timestamp": "2026-11-10T09:00:16.152Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user arjun from 10.0.9.73", "logger": "auth.login", "event": "auth_success", "username": "arjun", "client_ip": "10.0.9.73"}
+2026-11-10T09:00:16.282Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=55b228f390824f0fad1f1f0f8442c74f span_id=ac02165739324154 parent_span_id=11012cd631644355
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:16.291Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1370", "trace_id": "55b228f390824f0fad1f1f0f8442c74f", "span_id": "11012cd631644355", "parent_span_id": "737bfa133bd04948", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1370", "region": "ap-south-2"}
+2026-11-10T09:00:16.296Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=55b228f390824f0fad1f1f0f8442c74f span_id=737bfa133bd04948
+2026-11-10T09:00:16.870Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=273df76d1d6442c0b5f02e6145908e12 span_id=84cc58fdb76041ae parent_span_id=9554579574f44c58
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:16.879Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1556", "trace_id": "273df76d1d6442c0b5f02e6145908e12", "span_id": "9554579574f44c58", "parent_span_id": "beb167cf94a44d64", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1556", "region": "ap-south-2"}
+2026-11-10T09:00:16.884Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=273df76d1d6442c0b5f02e6145908e12 span_id=beb167cf94a44d64
+{"timestamp": "2026-11-10T09:00:16.985Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user priya from 10.0.4.40", "logger": "auth.login", "event": "auth_success", "username": "priya", "client_ip": "10.0.4.40"}
+2026-11-10T09:00:17.445Z INFO [inventory-service] c.s.i.StockService - Reserved 1 x SKU-1674 trace_id=9d6aa4ac7fcf4a4bac9fc72d5130ddf3 span_id=f941ebf2902549a2 parent_span_id=381e9eb54ab442f9
+{"timestamp": "2026-11-10T09:00:17.470Z", "level": "INFO", "service": "order-service", "message": "Order created", "trace_id": "9d6aa4ac7fcf4a4bac9fc72d5130ddf3", "span_id": "381e9eb54ab442f9", "parent_span_id": "6176abc95cc04018", "logger": "orders.service"}
+2026-11-10T09:00:17.485Z INFO [api-gateway] POST /api/orders 201 55ms trace_id=9d6aa4ac7fcf4a4bac9fc72d5130ddf3 span_id=6176abc95cc04018
+{"timestamp": "2026-11-10T09:00:17.902Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user neha from 10.0.3.69", "logger": "auth.login", "event": "auth_success", "username": "neha", "client_ip": "10.0.3.69"}
+2026-11-10T09:00:17.919Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=9aef080322ea4483bfefb878dbc273aa span_id=56d652ce0e494c96 parent_span_id=4a9e884b1bf540ac
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:17.928Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1776", "trace_id": "9aef080322ea4483bfefb878dbc273aa", "span_id": "4a9e884b1bf540ac", "parent_span_id": "6c29b43b3b224267", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1776", "region": "ap-south-2"}
+2026-11-10T09:00:17.933Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=9aef080322ea4483bfefb878dbc273aa span_id=6c29b43b3b224267
+{"timestamp": "2026-11-10T09:00:18.264Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user kavya from 10.0.9.96", "logger": "auth.login", "event": "auth_success", "username": "kavya", "client_ip": "10.0.9.96"}
+2026-11-10T09:00:18.735Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=16f9df16b7804b63a79ff7ac9a62fdff span_id=c4c67ea6b5db4390 parent_span_id=4024d3f207174bd9
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:18.744Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1658", "trace_id": "16f9df16b7804b63a79ff7ac9a62fdff", "span_id": "4024d3f207174bd9", "parent_span_id": "c75920734e084fbf", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1658", "region": "ap-south-2"}
+2026-11-10T09:00:18.749Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=16f9df16b7804b63a79ff7ac9a62fdff span_id=c75920734e084fbf
+2026-11-10T09:00:18.911Z INFO [inventory-service] c.s.i.StockService - Reserved 1 x SKU-1707 trace_id=933f05069cea4be993905a7b30ee8045 span_id=b0d8a506ed6e489d parent_span_id=b97e221184604835
+{"timestamp": "2026-11-10T09:00:18.936Z", "level": "INFO", "service": "order-service", "message": "Order created", "trace_id": "933f05069cea4be993905a7b30ee8045", "span_id": "b97e221184604835", "parent_span_id": "50c7bd551a394633", "logger": "orders.service"}
+2026-11-10T09:00:18.951Z INFO [api-gateway] POST /api/orders 201 55ms trace_id=933f05069cea4be993905a7b30ee8045 span_id=50c7bd551a394633
+{"timestamp": "2026-11-10T09:00:19.698Z", "level": "INFO", "service": "payment-service", "message": "Card charged", "trace_id": "e8aa2d36810c49299d243aedd7c5cffe", "span_id": "73e29617be4b4553", "parent_span_id": "eda95effb2e9455b", "logger": "payment.api", "amount": 270.86}
+2026-11-10T09:00:19.753Z ERROR [inventory-service] c.s.i.InventoryController - Request processing failed trace_id=e56d043eedbd4b42b2a0a7f004d5c081 span_id=590c627b24ed432e parent_span_id=6537f4c1da644c29
+java.lang.NullPointerException: Cannot invoke "com.shop.inventory.Warehouse.getStock(String)" because "warehouse" is null
+	at com.shop.inventory.StockService.reserve(StockService.java:18)
+	at com.shop.inventory.InventoryController.reserve(InventoryController.java:17)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+{"timestamp": "2026-11-10T09:00:19.762Z", "level": "ERROR", "service": "order-service", "message": "InventoryReservationError: inventory-service returned 500 for SKU-1712", "trace_id": "e56d043eedbd4b42b2a0a7f004d5c081", "span_id": "6537f4c1da644c29", "parent_span_id": "d00b1ed415a74a10", "logger": "orders.service", "exception": "Traceback (most recent call last):\n  File \"/app/orders/service.py\", line 16, in create_order\n    raise InventoryReservationError(f\"inventory-service returned {r.status_code} ...\")\norders.service.InventoryReservationError: inventory-service returned 500 for SKU-1712", "region": "ap-south-2"}
+2026-11-10T09:00:19.767Z ERROR [api-gateway] POST /api/orders 500 upstream order-service failed trace_id=e56d043eedbd4b42b2a0a7f004d5c081 span_id=d00b1ed415a74a10
+ts=2026-11-10T09:00:19.854Z level=info service=checkout-service trace_id=e8aa2d36810c49299d243aedd7c5cffe span_id=eda95effb2e9455b parent_span_id=fc2ee10add73475e order_id="ORD-99204" msg="Order placed"
+2026-11-10T09:00:19.874Z INFO [api-gateway] POST /api/checkout 200 206ms trace_id=e8aa2d36810c49299d243aedd7c5cffe span_id=fc2ee10add73475e
+{"timestamp": "2026-11-10T09:00:20.411Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user arjun from 10.0.7.104", "logger": "auth.login", "event": "auth_success", "username": "arjun", "client_ip": "10.0.7.104"}
+{"timestamp": "2026-11-10T09:00:20.821Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user priya from 10.0.1.50", "logger": "auth.login", "event": "auth_success", "username": "priya", "client_ip": "10.0.1.50"}
+{"timestamp": "2026-11-10T09:00:21.654Z", "level": "INFO", "service": "auth-service", "message": "Login succeeded for user neha from 10.0.3.30", "logger": "auth.login", "event": "auth_success", "username": "neha", "client_ip": "10.0.3.30"}

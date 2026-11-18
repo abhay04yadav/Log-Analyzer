@@ -16,7 +16,7 @@ export default function IncidentRow({ incident: i, compact = false }) {
         </div>
         <div className="mt-1 truncate text-sm font-medium text-slate-800">{i.title}</div>
         <div className="mt-0.5 truncate text-xs text-slate-500">
-          {i.top_candidate && <>Root cause: <b className="font-medium text-slate-700">{i.top_candidate.service}</b> · score {i.top_candidate.score.toFixed(2)} · </>}
+          {i.top_candidate && <>Root cause: <b className="font-medium text-slate-700">{i.top_candidate.service}</b> · score {i.top_candidate.score.toFixed(2)}{i.top_candidate.confidence_label && <> ({i.top_candidate.confidence_label} confidence)</>} · </>}
           {i.services.length} service{i.services.length === 1 ? "" : "s"} · {i.event_count} events{!compact && <> · {i.services.join(", ")}</>}
         </div>
       </div>

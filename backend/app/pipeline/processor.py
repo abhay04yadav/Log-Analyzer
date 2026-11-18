@@ -30,7 +30,8 @@ settings = get_settings()
 stats = {"processed_events": 0, "processed_batches": 0, "last_batch_at": None, "errors": 0}
 
 
-def process_batch(db: Session, project_id: int, items: list, default_service: str | None = None) -> set[int]:
+def process_batch(db: Session, project_id: int, items: list, default_service: str | None = None,
+                  ts_offset_seconds: float = 0.0) -> set[int]:
     known = list(db.scalars(select(KnownError)))
     events: list[LogEvent] = []
     for item in items:
@@ -39,6 +40,8 @@ def process_batch(db: Session, project_id: int, items: list, default_service: st
         except Exception as e:  # one malformed line must never stop the batch
             log.warning("could not normalise item: %s", e)
             n = normalise(str(item)[:2000], default_service, settings.max_message_chars)
+        if ts_offset_seconds:                      # replayed log file: shift to "now"
+            n["ts"] = n["ts"] + timedelta(seconds=ts_offset_seconds)
         ev = LogEvent(project_id=project_id, received_at=utcnow(), **n)
         if ev.is_error:
             ev.fingerprint = fingerprint(ev.service, ev.error_type, ev.message, ev.stack)
@@ -128,7 +131,8 @@ class Worker:
                         for msg_id, payload in msgs:
                             try:
                                 process_batch(db, payload["project_id"], payload["events"],
-                                              payload.get("default_service"))
+                                              payload.get("default_service"),
+                                              payload.get("ts_offset_seconds") or 0.0)
                                 stats["processed_events"] += len(payload["events"])
                                 stats["processed_batches"] += 1
                                 stats["last_batch_at"] = utcnow().isoformat() + "Z"

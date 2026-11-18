@@ -53,6 +53,7 @@ def incident_detail(incident_id: int, db: Session = Depends(get_db), _: str = De
         "detection": inc.detection,
         "graph": inc.graph or {"nodes": [], "edges": []},
         "candidates": [candidate_out(c) for c in inc.candidates],
+        "similar": inc.similar or [],
         "weights": weights,
         "signal_names": SIGNAL_NAMES,
         "timeline": [event_out(e) for e in events],

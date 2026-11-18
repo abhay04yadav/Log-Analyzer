@@ -1,0 +1,1132 @@
+{
+  "summary": {
+    "runs": 20,
+    "scenario_cases": 80,
+    "events": 10157,
+    "detection_rate": 1.0,
+    "top1": 1.0,
+    "top3": 1.0,
+    "grouping_precision": 1.0,
+    "grouping_recall": 1.0,
+    "grouping_f1": 1.0,
+    "false_positive_incidents": 0,
+    "split_incidents": 0,
+    "ttd_mean_s": 1.706828858899177,
+    "ttd_max_s": 3.784597422840953,
+    "recommendation_valid": 1.0,
+    "recommendation_sources": {
+      "rules": 40,
+      "playbook": 40
+    },
+    "ablation_top1": {
+      "T": 0.625,
+      "D": 1.0,
+      "A": 0.25,
+      "C": 0.75,
+      "H": 0.5
+    },
+    "mean_top_confidence": 0.77985
+  },
+  "runs": [
+    {
+      "seed": 1,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.744,
+          "ttd": 1.0686550718321897,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.74,
+          "ttd": 2.3332928227172083,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.75,
+          "ttd": 0.860751741744572,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 3.04275686138282,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 4,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 508
+    },
+    {
+      "seed": 2,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.658,
+          "ttd": 2.1230331212547,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.657,
+          "ttd": 2.9364247515239814,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.665,
+          "ttd": 0.1578790710675353,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 3.52555015905077,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 1,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 493
+    },
+    {
+      "seed": 3,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.744,
+          "ttd": 1.5974425329288753,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.739,
+          "ttd": 1.4343669413464184,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.75,
+          "ttd": 0.26222065967775876,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 2.311412655302952,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 4,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 497
+    },
+    {
+      "seed": 4,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.671,
+          "ttd": 1.3999758859630802,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.671,
+          "ttd": 2.63670724170729,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.677,
+          "ttd": 0.305529396722207,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 2.674825915586284,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 1,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 500
+    },
+    {
+      "seed": 5,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.744,
+          "ttd": 1.6758406078743793,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.74,
+          "ttd": 1.641780104524118,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.75,
+          "ttd": 0.4926630690261362,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 2.35361961152811,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 4,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 495
+    },
+    {
+      "seed": 6,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.661,
+          "ttd": 1.969180484252611,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.66,
+          "ttd": 2.440538973538054,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.667,
+          "ttd": 0.0006539507425280533,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 2.62365029914211,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 1,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 515
+    },
+    {
+      "seed": 7,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.744,
+          "ttd": 1.5673405058181018,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.739,
+          "ttd": 1.8919312489496303,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.75,
+          "ttd": 0.02989792059209151,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 3.476758915060879,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 4,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 510
+    },
+    {
+      "seed": 8,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.671,
+          "ttd": 1.2938383046619961,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.671,
+          "ttd": 1.3876456721956476,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.677,
+          "ttd": 0.06554423749795646,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 2.7297633249013273,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 1,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 513
+    },
+    {
+      "seed": 9,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.744,
+          "ttd": 1.3861658695290178,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.739,
+          "ttd": 2.536046130853494,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.75,
+          "ttd": 0.0843371374243631,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 3.704803266723978,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 4,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 506
+    },
+    {
+      "seed": 10,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.665,
+          "ttd": 1.9298190835259632,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.665,
+          "ttd": 2.1763589197466153,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.671,
+          "ttd": 0.3428214696931824,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 2.498301536706933,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 1,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 505
+    },
+    {
+      "seed": 11,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.744,
+          "ttd": 1.6079986685684897,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.739,
+          "ttd": 2.6653327723921336,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.75,
+          "ttd": 0.6037647262205859,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 3.784597422840953,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 4,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 533
+    },
+    {
+      "seed": 12,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.667,
+          "ttd": 1.5109697040754178,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.666,
+          "ttd": 2.3154670062153997,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.673,
+          "ttd": 0.07382845975578434,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 2.2472509215016903,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 1,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 502
+    },
+    {
+      "seed": 13,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.744,
+          "ttd": 0.9355992600398189,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.739,
+          "ttd": 3.134394762828208,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.75,
+          "ttd": 0.04479121422399146,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 2.665321328097882,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 4,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 514
+    },
+    {
+      "seed": 14,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.673,
+          "ttd": 1.6401977020407612,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.673,
+          "ttd": 1.7084107907475392,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.679,
+          "ttd": 0.03798739964115505,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 3.3838142209750686,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 1,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 514
+    },
+    {
+      "seed": 15,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.744,
+          "ttd": 1.976709217952827,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.739,
+          "ttd": 1.3822078444303685,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.75,
+          "ttd": 0.33567309861511774,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 3.0149601650071842,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 4,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 504
+    },
+    {
+      "seed": 16,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.668,
+          "ttd": 0.9342564925101575,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.668,
+          "ttd": 2.689949891152409,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.675,
+          "ttd": 0.008781541152655947,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 3.61086419808845,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 1,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 524
+    },
+    {
+      "seed": 17,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.744,
+          "ttd": 1.28593222200786,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.74,
+          "ttd": 1.9982846442707007,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.75,
+          "ttd": 0.07825567970526848,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 3.035269437140194,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 4,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 522
+    },
+    {
+      "seed": 18,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.672,
+          "ttd": 1.2468430595428668,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.672,
+          "ttd": 1.5619992159329428,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.678,
+          "ttd": 8.60000000000305e-05,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 3.1889161737972813,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 1,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 485
+    },
+    {
+      "seed": 19,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.744,
+          "ttd": 1.765709032472401,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.74,
+          "ttd": 2.0209914364581327,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.75,
+          "ttd": 4.804150307791133e-06,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 2.671522159021386,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 4,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 498
+    },
+    {
+      "seed": 20,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "incidents": 4,
+      "false_positives": 0,
+      "splits": 0,
+      "per": {
+        "db_pool_exhaustion": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.659,
+          "ttd": 1.1902620078841775,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "inventory_null_pointer": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.659,
+          "ttd": 1.675490078913466,
+          "rec_source": "rules",
+          "rec_valid": true
+        },
+        "cache_outage": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 0.665,
+          "ttd": 0.18674799003176012,
+          "rec_source": "playbook",
+          "rec_valid": true
+        },
+        "brute_force_login": {
+          "detected": true,
+          "category_ok": true,
+          "rank": 1,
+          "confidence": 1.0,
+          "ttd": 3.356740487213486,
+          "rec_source": "playbook",
+          "rec_valid": true
+        }
+      },
+      "ablation": {
+        "T": 1,
+        "D": 4,
+        "A": 1,
+        "C": 3,
+        "H": 2
+      },
+      "events": 519
+    }
+  ]
+}

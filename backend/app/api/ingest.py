@@ -6,14 +6,15 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field, field_validator
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.bus import RAW_STREAM, get_bus
 from app.core.config import get_settings
-from app.core.security import project_from_api_key
-from app.db import get_db
+from app.core.security import current_user, project_from_api_key
+from app.db import get_db, utcnow
 from app.models import Deployment, Project
-from app.pipeline.normalize import _parse_ts
+from app.pipeline.normalize import _parse_ts, normalise, split_entries
 
 router = APIRouter(prefix="/api/v1", tags=["ingestion"])
 settings = get_settings()
@@ -50,6 +51,48 @@ def ingest(body: IngestRequest, project: Project = Depends(project_from_api_key)
     msg_id = get_bus().publish(RAW_STREAM, {"project_id": project.id, "events": body.events,
                                             "default_service": body.service})
     return {"accepted": len(body.events), "message_id": msg_id}
+
+
+MAX_FILE_CHARS = 5_000_000
+CHUNK = 500
+
+
+class TextIngestRequest(BaseModel):
+    content: str = Field(..., min_length=1, max_length=MAX_FILE_CHARS, description="log file contents")
+    service: str | None = Field(None, max_length=120, description="service name for lines that carry none")
+    filename: str | None = Field(None, max_length=255)
+    replay: bool = Field(False, description="shift timestamps so the file ends now (replay as live traffic)")
+
+
+def publish_text(project_id: int, body: TextIngestRequest) -> dict:
+    """Split a log file into entries (multi-line stack traces stay together) and publish in chunks."""
+    entries = split_entries(body.content, settings.max_message_chars)
+    if not entries:
+        raise HTTPException(422, "no log entries found")
+    offset = 0.0
+    parsed = [normalise(e, body.service, 2000)["ts"] for e in entries]
+    if body.replay and parsed:
+        offset = (utcnow() - max(parsed)).total_seconds()
+    bus = get_bus()
+    for i in range(0, len(entries), CHUNK):
+        bus.publish(RAW_STREAM, {"project_id": project_id, "events": entries[i:i + CHUNK],
+                                 "default_service": body.service, "ts_offset_seconds": offset})
+    return {"accepted": len(entries), "chunks": (len(entries) + CHUNK - 1) // CHUNK,
+            "first_ts": min(parsed).isoformat() + "Z", "last_ts": max(parsed).isoformat() + "Z",
+            "replay_offset_seconds": round(offset, 1), "filename": body.filename}
+
+
+@router.post("/ingest/text", status_code=202)
+def ingest_text(body: TextIngestRequest, project: Project = Depends(project_from_api_key)):
+    """Ingest a whole log file (plain text) with the project API key - e.g. from a log shipper or CI job."""
+    return publish_text(project.id, body)
+
+
+@router.post("/upload", status_code=202)
+def upload(body: TextIngestRequest, _: str = Depends(current_user), db: Session = Depends(get_db)):
+    """Log file upload from the dashboard (signed-in user, default project)."""
+    pid = db.scalar(select(Project.id).order_by(Project.id).limit(1))
+    return publish_text(pid, body)
 
 
 def store_deployment(db: Session, project_id: int, d: dict) -> Deployment:

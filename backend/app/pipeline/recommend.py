@@ -79,6 +79,10 @@ def build_evidence(db: Session, incident: Incident, cand: Candidate) -> list[dic
         add("deployment", f"{d.service} {d.version} (commit {d.commit}) deployed at {d.ts.isoformat()}Z by "
                           f"{d.author}: {d.description}. Changed files: {', '.join(d.changed_files or [])}",
             deployment_id=d.id)
+    for s in (incident.similar or [])[:2]:      # what fixed the same problem before
+        add("history", f"Similar past incident #{s['incident_id']} ({s['title']}), similarity {s['similarity']:.2f}, "
+                       f"root cause confirmed by an engineer. Fix used then: {s.get('fix') or 'n/a'}; "
+                       f"steps: {'; '.join(s.get('fix_steps') or [])}", incident_id=s["incident_id"])
     add("graph", "Service graph edges (caller -> callee, calls/errors): " + "; ".join(
         f"{e['source']}->{e['target']} {e['calls']}/{e['errors']}" for e in (incident.graph or {}).get("edges", [])))
     return ev

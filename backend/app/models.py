@@ -104,6 +104,7 @@ class Incident(Base):
     event_count: Mapped[int] = mapped_column(Integer, default=0)
     error_count: Mapped[int] = mapped_column(Integer, default=0)
     graph: Mapped[dict | None] = mapped_column(JSONType)
+    similar: Mapped[list | None] = mapped_column(JSONType)          # similar confirmed past incidents
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     needs_recommendation: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -126,6 +127,8 @@ class Candidate(Base):
     error_type: Mapped[str | None] = mapped_column(String(200))
     message: Mapped[str] = mapped_column(Text)
     score: Mapped[float] = mapped_column(Float)
+    confidence: Mapped[float] = mapped_column(Float, default=0.0)   # magnitude of R + signal agreement
+    confidence_detail: Mapped[dict | None] = mapped_column(JSONType)
     signals: Mapped[dict] = mapped_column(JSONType)                # T D A C H  in [0, 1]
     reasons: Mapped[dict] = mapped_column(JSONType)                # human-readable explanation per signal
     event_ids: Mapped[list] = mapped_column(JSONType)

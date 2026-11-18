@@ -208,6 +208,26 @@ def _parse_text(text: str) -> dict:
     return ev
 
 
+ENTRY_START = re.compile(r"^(\{|\d{4}-\d{2}-\d{2}[ T]\d|[A-Za-z_][\w.]*=\S)")
+
+
+def split_entries(text: str, max_entry_chars: int = 16000) -> list[str]:
+    """Split a log file into entries; continuation lines (stack frames, 'Caused by', the Python
+    exception line ...) are appended to the entry they belong to."""
+    lines = text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+    if not any(ENTRY_START.match(ln) for ln in lines):           # unknown layout: one entry per line
+        return [ln for ln in lines if ln.strip()]
+    entries: list[str] = []
+    for ln in lines:
+        if not ln.strip():
+            continue
+        if ENTRY_START.match(ln) or not entries:
+            entries.append(ln)
+        elif len(entries[-1]) < max_entry_chars:
+            entries[-1] += "\n" + ln
+    return entries
+
+
 def normalise(item, default_service: str | None = None, max_chars: int = 16000) -> dict:
     """Turn one raw input item into the canonical event dict (not yet persisted)."""
     raw_text = item if isinstance(item, str) else json.dumps(item, default=str)

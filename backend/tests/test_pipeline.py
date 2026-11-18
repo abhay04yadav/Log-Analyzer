@@ -1,5 +1,6 @@
 """End-to-end pipeline tests: every simulator scenario must produce the expected root cause."""
 from datetime import timedelta
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -120,3 +121,55 @@ def test_api_flow_and_feedback():
     after = client.get("/api/v1/settings/weights", headers=h).json()["current"]
     assert after != before and abs(sum(after.values()) - 1) < 1e-3
     assert client.get(f"/api/v1/incidents/{inc.id}", headers=h).json()["status"] == "resolved"
+
+
+def test_split_entries_keeps_stack_traces():
+    from app.pipeline.normalize import split_entries
+
+    text = ("2026-11-18 10:00:00 INFO [a] started\n"
+            "2026-11-18 10:00:01 ERROR [a] failed\n"
+            "Traceback (most recent call last):\n"
+            '  File "/app/x.py", line 3, in run\n'
+            "ValueError: boom\n"
+            '{"level": "info", "message": "json line"}\n'
+            "ts=2026-11-18T10:00:02Z level=warn msg=slow\n")
+    entries = split_entries(text)
+    assert len(entries) == 4 and "ValueError: boom" in entries[1]
+    assert normalise(entries[1])["error_type"] == "ValueError"
+
+
+def test_confidence_and_similar_incidents():
+    client = TestClient(app)
+    tok = client.post("/api/v1/auth/login", json={"username": "admin", "password": "admin123"}).json()["access_token"]
+    h = {"Authorization": f"Bearer {tok}"}
+    first = [i for i in play("db_pool_exhaustion") if i.category == "error"][0]
+    top = first.candidates[0]
+    assert 0.5 <= top.confidence <= 1 and top.confidence_detail["label"] in ("high", "medium")
+    assert "T" in top.confidence_detail["supporting"]
+    client.post(f"/api/v1/incidents/{first.id}/feedback", headers=h,
+                json={"verdict": "confirmed", "candidate_id": top.id})
+
+    with SessionLocal() as db:                 # same failure again later -> history kicks in
+        for m in (LogEvent,):
+            db.execute(delete(m).where(LogEvent.incident_id.is_(None)))
+        db.commit()
+    incs = [i for i in play("db_pool_exhaustion") if i.category == "error" and i.id != first.id]
+    assert len(incs) == 1
+    second = incs[0]
+    assert second.similar and second.similar[0]["incident_id"] == first.id
+    assert second.candidates[0].signals["H"] >= 0.8
+    assert f"#{first.id}" in second.candidates[0].reasons["H"]
+    assert any(e["kind"] == "history" for e in second.recommendations[0].evidence)
+
+
+def test_file_upload_endpoint():
+    client = TestClient(app)
+    tok = client.post("/api/v1/auth/login", json={"username": "admin", "password": "admin123"}).json()["access_token"]
+    h = {"Authorization": f"Bearer {tok}"}
+    sample = (Path(__file__).resolve().parents[2] / "frontend/public/samples/shopflow-inventory-npe.log").read_text()
+    assert client.post("/api/v1/upload", json={"content": sample}).status_code == 401
+    r = client.post("/api/v1/upload", headers=h, json={"content": sample, "replay": True, "filename": "x.log"})
+    assert r.status_code == 202 and r.json()["accepted"] > 100 and r.json()["replay_offset_seconds"] != 0
+    r = client.post("/api/v1/ingest/text", headers={"X-API-Key": "sla_demo_ingest_key"},
+                    json={"content": "2026-11-18 10:00:00 ERROR [svc] boom"})
+    assert r.status_code == 202 and r.json()["accepted"] == 1

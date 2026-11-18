@@ -23,6 +23,7 @@ from sqlalchemy.orm import Session
 from app.core.config import get_settings
 from app.models import Candidate, Deployment, ErrorSignature, Incident, KnownError, LogEvent, Setting
 from app.pipeline.detect import is_auth_failure, match_known, source_ip
+from app.pipeline.similar import find_similar
 from app.pipeline.traceback import build_graph, code_location, reachable_upstream
 
 settings = get_settings()
@@ -64,11 +65,14 @@ def analyse(db: Session, incident: Incident) -> None:
     for c in cands:
         c["score"] = round(sum(weights[k] * c["signals"][k] for k in weights), 4)
     cands.sort(key=lambda c: (-c["score"], c["first_seen"]))
+    add_confidence(cands)
 
+    incident.similar = cands[0].get("similar", []) if cands else []
     old = {(c.service, c.fingerprint): c.verdict for c in incident.candidates}
     incident.candidates.clear()
     db.flush()
     for i, c in enumerate(cands[:8], 1):
+        c.pop("similar", None)
         incident.candidates.append(Candidate(rank=i, verdict=old.get((c["service"], c["fingerprint"])), **c))
 
     if cands:
@@ -82,6 +86,33 @@ def analyse(db: Session, incident: Incident) -> None:
             incident.title = f"{what} in {top['service']}{impacted}"
         if incident.category == "error" and len(graph["nodes"]) >= 3 and incident.severity in ("low", "medium"):
             incident.severity = "high"
+
+
+def add_confidence(cands: list[dict]) -> None:
+    """Confidence = magnitude of R + agreement between signals (+ separation from the runner-up).
+
+    agreement  share of the 5 signals that independently point at this candidate (the candidate is
+               strongest, or within 0.05 of the strongest, on that signal and the signal is >= 0.5)
+    margin     how far the candidate is ahead of the next one, relative to its own score
+    confidence = 0.5 * R + 0.3 * agreement + 0.2 * margin
+    """
+    if not cands:
+        return
+    best = {k: max(c["signals"][k] for c in cands) for k in DEFAULT_WEIGHTS}
+    for i, c in enumerate(cands):
+        supporting = [k for k in DEFAULT_WEIGHTS if c["signals"][k] >= 0.5 and c["signals"][k] >= best[k] - 0.05]
+        agreement = len(supporting) / len(DEFAULT_WEIGHTS)
+        nxt = cands[i + 1]["score"] if i + 1 < len(cands) else 0.0
+        prev = cands[i - 1]["score"] if i > 0 else None
+        if prev is not None:                       # not the top candidate: no lead over the others
+            margin = 0.0
+        else:
+            margin = (c["score"] - nxt) / c["score"] if c["score"] > 0 else 0.0
+        conf = min(1.0, 0.5 * c["score"] + 0.3 * agreement + 0.2 * margin)
+        label = "high" if conf >= 0.75 else "medium" if conf >= 0.5 else "low"
+        c["confidence"] = round(conf, 3)
+        c["confidence_detail"] = {"magnitude": round(c["score"], 3), "agreement": round(agreement, 2),
+                                  "margin": round(margin, 3), "supporting": supporting, "label": label}
 
 
 def _error_candidates(db, incident, errors, graph, known) -> list[dict]:
@@ -163,8 +194,18 @@ def _error_candidates(db, incident, errors, graph, known) -> list[dict]:
             H, reasons["H"] = 0.2, "seen before, never confirmed as a root cause"
         else:
             H, reasons["H"] = 0.0, "no history"
+        cand_key = {"service": service, "fingerprint": fp, "error_type": rep.error_type, "message": rep.message}
+        similar = find_similar(db, incident, cand_key)
+        if similar and not k:
+            s = similar[0]
+            h_sim = round(0.9 * s["similarity"], 3)
+            if h_sim >= H:
+                H = h_sim
+                reasons["H"] = (f"similar to confirmed incident #{s['incident_id']} "
+                                f"(similarity {s['similarity']:.2f}"
+                                + (f", fixed by: {s['fix']}" if s.get("fix") else "") + ")")
 
-        out.append(dict(service=service, fingerprint=fp, error_type=rep.error_type, message=rep.message[:1000],
+        out.append(dict(similar=similar,service=service, fingerprint=fp, error_type=rep.error_type, message=rep.message[:1000],
                         signals={"T": round(T, 3), "D": round(D, 3), "A": round(A, 3), "C": round(C, 3),
                                  "H": round(H, 3)},
                         reasons=reasons, event_ids=[e.id for e in evs][:200], first_seen=first, count=len(evs),

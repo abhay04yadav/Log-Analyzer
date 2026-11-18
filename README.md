@@ -85,7 +85,44 @@ flowchart LR
 | **D** dependency position | deepest failing service, and how many services it impacts | service graph from spans |
 | **A** anomaly | rate compared with the fingerprint's own baseline | event counts |
 | **C** code & change | stack resolved to code, recent deployment, failing file changed in it | repository snapshot + deployment records |
-| **H** history | known signature, or confirmed root cause in a past incident | playbook + feedback |
+| **H** history | known signature, or similarity to past incidents whose root cause was confirmed | playbook + feedback + similar-incident search |
+
+**Confidence** follows the IDF: the magnitude of R plus the agreement between signals.
+
+`confidence = 0.5·R + 0.3·agreement + 0.2·lead over the next candidate`
+
+- *Agreement* is the share of the five signals that independently point at the candidate.
+- The result is shown as high, medium or low, with the full breakdown.
+
+**Similar past incidents** (`app/pipeline/similar.py`) are found in two ways:
+- the same fingerprint, or
+- token similarity of the error type and the message template.
+
+A confirmed match raises H, appears on the incident page together with the fix that was used, and is given to the AI as evidence.
+
+## Evaluation
+
+```bash
+cd backend && python -m app.evaluation --runs 20      # writes docs/evaluation.md (+ .json)
+```
+
+Each run replays all four scenarios **overlapping in time**, on an isolated database, with three confounders:
+- clock skew, so the gateway's symptom errors appear *first*
+- an unrelated "red-herring" gateway deployment
+- harmless noise errors
+
+The simulator knows which scenario produced every line, so the results are scored exactly against ground truth.
+
+Latest results ([docs/evaluation.md](docs/evaluation.md), 20 runs, about 3,000 events):
+
+| Metric | Result |
+|---|---|
+| Incident detection / root cause top-1 | 100% / 100% |
+| Grouping F1 (pairwise) / false-positive incidents | 1.000 / 0 |
+| Mean time to detect (log time) | 1.7 s |
+| Top-1 using **one** signal only: T / D / A / C / H | 62.5% / 100% / 25% / 75% / 50% |
+
+The data is synthetic, so real-world accuracy will be lower. The ablation shows why the signals are combined: temporal order alone is fooled by clock skew, and code & change alone is fooled by unrelated deployments.
 
 ### Security
 - Dashboard login uses HMAC-signed, expiring bearer tokens, and login attempts are rate-limited.
@@ -109,6 +146,8 @@ flowchart LR
 6. **Run "Brute-force login attack":** a critical security incident, because a login succeeded after 14 failures.
 7. **Run "Redis cache outage":** matched by the known-error playbook, so no AI call is needed.
 8. **Log explorer:** search `NullPointerException` and open an event to see the parsed Java stack and the masked raw input.
+9. **Upload a log file** (Simulator page → Samples → "Java NullPointerException" → Ingest). A plain log file becomes an incident.
+10. **History:** run the payment scenario again after confirming it. The new incident shows "Similar past incidents" with the earlier fix, and its confidence rises.
 
 ## Sending real logs
 
@@ -118,7 +157,14 @@ curl -X POST http://localhost:8000/api/v1/ingest \
   -d '{"events": [{"level":"error","service":"billing","message":"Timeout calling ledger"}]}'
 
 python -m app.simulator.cli db_pool_exhaustion      # replays a scenario over HTTP like a log shipper
+
+# a whole log file (JSON lines / logfmt / text with multi-line stack traces)
+python -c "import json,sys;print(json.dumps({'content':open(sys.argv[1]).read(),'replay':True}))" app.log \
+  | curl -X POST http://localhost:8000/api/v1/ingest/text -H "X-API-Key: sla_demo_ingest_key" \
+         -H "Content-Type: application/json" -d @-
 ```
+
+Sample log files are in `frontend/public/samples/`. The dashboard can also upload files (Simulator page).
 
 Interactive API documentation is at http://localhost:8000/docs.
 
@@ -129,8 +175,9 @@ cd backend && python -m pytest -q
 ```
 
 The tests replay all four scenarios through the pipeline and assert the expected root cause, code
-location, deployment link, playbook match and security detection. They also cover authentication
-and the feedback-driven weight update.
+location, deployment link, playbook match and security detection. They also cover authentication,
+the feedback-driven weight update, the confidence score, similar-incident retrieval, and log-file
+splitting and upload.
 
 ## Project layout
 
@@ -138,10 +185,13 @@ and the feedback-driven weight update.
 backend/
   app/api/          REST endpoints (auth, ingest, events, incidents, system)
   app/pipeline/     S2-S8 stages + worker
-  app/simulator/    ShopFlow failure scenarios, runner and CLI
+  app/simulator/    ShopFlow failure scenarios, runner, CLI and log-file export
+  app/evaluation.py accuracy evaluation against ground truth
   sample_repo/      code snapshot used by the traceback stage
   tests/
 frontend/src/       React + Vite + Tailwind dashboard
+frontend/public/samples/  sample log files for the upload feature
+docs/evaluation.md  latest evaluation results
 docker-compose.yml  PostgreSQL, Redis, API, worker, Nginx
 ```
 

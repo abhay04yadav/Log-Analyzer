@@ -54,6 +54,7 @@ export default function IncidentDetail() {
             <div className="p-3"><ServiceGraph graph={d.graph} highlight={top?.service} /></div>
             <div className="border-t border-slate-100 px-4 py-2 text-[11px] text-slate-500">Built from spans in the logs. Red edges carry errors; the outlined node is the top-ranked root cause.</div>
           </div>
+          {d.similar?.length > 0 && <SimilarIncidents items={d.similar} />}
           {top?.code_location && <CodeContext loc={top.code_location} />}
           {d.deployments.length > 0 && (
             <div className="card">
@@ -134,6 +135,7 @@ function Candidates({ d, onChanged }) {
                 <div className="mt-1.5 flex items-center gap-2">
                   <ScoreBar signals={c.signals} weights={w} />
                   <span className="w-10 text-right text-sm font-semibold tabular-nums text-slate-800">{c.score.toFixed(2)}</span>
+                  {i === 0 && <ConfidenceBadge c={c} />}
                 </div>
               </div>
               {open === i ? <ChevronDown size={16} className="text-slate-400" /> : <ChevronRight size={16} className="text-slate-400" />}
@@ -155,6 +157,15 @@ function Candidates({ d, onChanged }) {
                     ))}
                   </tbody>
                 </table>
+                {c.confidence_detail && (
+                  <div className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600">
+                    <b className="text-slate-700">Confidence {c.confidence.toFixed(2)} ({c.confidence_detail.label})</b>
+                    {" = 0.5 × R "}{c.confidence_detail.magnitude.toFixed(2)}
+                    {" + 0.3 × agreement "}{c.confidence_detail.agreement.toFixed(2)}
+                    {" + 0.2 × lead over next "}{c.confidence_detail.margin.toFixed(2)}
+                    <span className="text-slate-400"> · signals pointing here: {c.confidence_detail.supporting.join(", ") || "none"}</span>
+                  </div>
+                )}
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs text-slate-500">{c.count} occurrences · first {fmtTime(c.first_seen)} · fingerprint <span className="mono">{c.fingerprint || "—"}</span></span>
                   <div className="flex-1" />
@@ -172,6 +183,45 @@ function Candidates({ d, onChanged }) {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+const CONF = {
+  high: "bg-emerald-100 text-emerald-800",
+  medium: "bg-amber-100 text-amber-800",
+  low: "bg-slate-200 text-slate-700",
+};
+function ConfidenceBadge({ c }) {
+  const d = c.confidence_detail;
+  if (!d) return null;
+  return (
+    <span title={`Magnitude of R ${d.magnitude}, signal agreement ${d.agreement}, lead over next candidate ${d.margin}`}
+      className={`whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-semibold ${CONF[d.label]}`}>
+      {d.label} confidence
+    </span>
+  );
+}
+
+// ------------------------------------------------------------------ similar past incidents
+function SimilarIncidents({ items }) {
+  return (
+    <div className="card">
+      <div className="card-h"><div className="card-t"><History size={16} /> Similar past incidents</div></div>
+      <div className="divide-y divide-slate-100">
+        {items.map((s) => (
+          <Link key={s.incident_id} to={`/incidents/${s.incident_id}`} className="block space-y-1 px-4 py-3 hover:bg-slate-50">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-slate-400">#{s.incident_id}</span>
+              <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800">{s.title}</span>
+              <Pill className="!bg-brand-50 !text-brand-700">{Math.round(s.similarity * 100)}% similar</Pill>
+            </div>
+            <div className="text-xs text-slate-500">Root cause confirmed: <b className="font-medium text-slate-700">{s.service}</b> · {s.error_type}</div>
+            {s.fix && <div className="text-xs text-emerald-700">Fixed by: {s.fix}</div>}
+          </Link>
+        ))}
+      </div>
+      <div className="border-t border-slate-100 px-4 py-2 text-[11px] text-slate-500">Earlier incidents with an engineer-confirmed root cause that match this failure. They raise the H (history) signal and are given to the AI as evidence.</div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { Bug, Database, KeyRound, Loader2, Play, Radio, ServerCrash, Square, Terminal, Trash2 } from "lucide-react";
 import { useState } from "react";
 import LiveTail from "../components/LiveTail.jsx";
+import UploadCard from "../components/UploadCard.jsx";
 import { api } from "../lib/api.js";
 import { usePoll } from "../lib/usePoll.js";
 
@@ -68,6 +69,7 @@ export default function Simulator() {
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">
+        <UploadCard />
         <LiveTail />
         <div className="card">
           <div className="card-h"><div className="card-t"><Terminal size={16} /> Send your own logs</div></div>
@@ -81,6 +83,7 @@ export default function Simulator() {
     "2026-11-19 10:00:01 ERROR [billing] retry budget exhausted",
     "ts=2026-11-19T10:00:02Z level=warn service=billing msg=\\"slow query\\""
   ]}'`}</pre>
+            <p>Whole log files: <span className="mono">POST /api/v1/ingest/text</span> with <span className="mono">{`{"content": "...file...", "replay": true}`}</span> and the same API key.</p>
             <p>Or run the standalone simulator against the API: <span className="mono">python -m app.simulator.cli db_pool_exhaustion</span></p>
           </div>
         </div>
