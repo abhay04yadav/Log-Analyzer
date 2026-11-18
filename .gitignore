@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+backend/sla.db*
+frontend/node_modules/
+frontend/dist/
+
+# project documents (names / roll numbers) - kept out of the public repository
+updated/

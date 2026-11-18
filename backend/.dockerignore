@@ -1,0 +1,6 @@
+__pycache__
+*.pyc
+.env
+sla.db*
+.pytest_cache
+tests

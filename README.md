@@ -1,0 +1,152 @@
+# Smart Log Analyzer
+
+**Intelligent incident diagnosis, traceback and fix recommendation for distributed applications.**
+B.Tech final-year project, G.L. Bajaj Institute of Technology & Management (group GC_2026_029).
+
+The system collects logs from many services, groups related failures into incidents, follows the
+failure back through the service graph to the code that caused it, ranks the root-cause candidates
+with an explainable score, and recommends a fix. The design principle is **evidence first,
+reasoning second**: every conclusion is backed by log events, traces, code or deployments, and the
+AI only explains evidence the system has already collected.
+
+## Quick start (lite mode, no installation of databases)
+
+```bash
+# 1. backend  (Python 3.12)
+cd backend
+pip install -r requirements.txt
+cp .env.example .env            # optional: put your GEMINI_API_KEY here
+python -m uvicorn app.main:app --port 8000
+
+# 2. frontend (Node 20+)
+cd frontend
+npm install
+npm run dev                     # http://localhost:5173   login: admin / admin123
+```
+
+Without `DATABASE_URL` and `REDIS_URL` the backend uses a local SQLite file and an in-memory queue,
+so the demo runs on any laptop. Without `GEMINI_API_KEY`, recommendations come from the known-error
+playbook and rule-based guidance.
+
+## Full stack (Docker)
+
+```bash
+cp .env.example .env            # set GEMINI_API_KEY and change the secrets
+docker compose up --build       # http://localhost:8080
+```
+
+This starts PostgreSQL 16 (JSONB and full-text search), Redis 7 (Redis Streams with consumer groups),
+the FastAPI API with its pipeline worker, an extra scalable worker
+(`docker compose up --scale worker=3`), and the React app served by Nginx.
+
+## Architecture
+
+```mermaid
+flowchart LR
+  subgraph Sources
+    A[Services / log shippers] -->|HTTPS + X-API-Key| I
+    SIM[Failure simulator] --> I
+  end
+  I["S1 Ingestion API<br/>validate · rate-limit"] -->|publish| BUS[(Redis Streams<br/>consumer group)]
+  BUS --> W
+  subgraph W[Pipeline worker]
+    N["S2 Normalise<br/>JSON · logfmt · text<br/>stack parsing · secret masking"] --> F["S3 Fingerprint"]
+    F --> DET["Detect<br/>known · spike · security"]
+    DET --> C["S4 Correlate<br/>fingerprint + trace + time"]
+    C --> T["S5 Traceback<br/>service graph · code location"]
+    T --> R["S6 Diagnose<br/>R = w1T + w2D + w3A + w4C + w5H"]
+    R --> REC["S7 Recommend<br/>playbook → Gemini → validator"]
+  end
+  W --> DB[(PostgreSQL<br/>events · incidents · candidates)]
+  REPO[(Code repository<br/>snapshot)] --> T
+  DB --> API[REST API] --> UI[React dashboard]
+  UI -->|confirm / reject| FB["S8 Learn<br/>update weights"] --> DB
+```
+
+| Stage | Module | What it does |
+|---|---|---|
+| S1 Ingest | `app/api/ingest.py` | API-key auth, size and rate limits, publishes the batch to the bus and returns 202 |
+| S2 Normalise | `app/pipeline/normalize.py` | JSON / logfmt / plain text → one schema; Python, Java and Node stack traces; masks passwords, tokens, cards and emails |
+| S3 Fingerprint | `app/pipeline/fingerprint.py` | Removes variable values and hashes service + error type + top app frames, so the same failure always gets the same id |
+| Detect | `app/pipeline/detect.py` | Known-error signatures, rate spikes against each fingerprint's own baseline, critical events, brute-force logins |
+| S4 Correlate | `app/pipeline/correlate.py` | Groups events into incidents by fingerprint, trace/request id and time; unrelated failures stay separate |
+| S5 Traceback | `app/pipeline/traceback.py` | Rebuilds the service graph from spans; maps the innermost app stack frame to the repository (Python `ast`, Java signatures) |
+| S6 Diagnose | `app/pipeline/rank.py` | Scores every candidate on 5 signals (below), each with a human-readable reason |
+| S7 Recommend | `app/pipeline/recommend.py`, `llm.py` | Known playbook first; otherwise Gemini gets only the evidence pack and must cite evidence ids; the validator checks the answer |
+| S8 Learn | `app/pipeline/feedback.py` | Confirm/reject adjusts the ranking weights and remembers confirmed root causes |
+
+### Root-cause score
+
+`R = w1·T + w2·D + w3·A + w4·C + w5·H`. Every signal is between 0 and 1, and the weights sum to 1.
+
+| Signal | Meaning | Evidence used |
+|---|---|---|
+| **T** temporal precedence | how early the failure started | first error timestamp per candidate |
+| **D** dependency position | deepest failing service, and how many services it impacts | service graph from spans |
+| **A** anomaly | rate compared with the fingerprint's own baseline | event counts |
+| **C** code & change | stack resolved to code, recent deployment, failing file changed in it | repository snapshot + deployment records |
+| **H** history | known signature, or confirmed root cause in a past incident | playbook + feedback |
+
+### Security
+- Dashboard login uses HMAC-signed, expiring bearer tokens, and login attempts are rate-limited.
+- Each project ingests with its own API key. Only the key's SHA-256 hash is stored.
+- Secrets are masked during normalisation, *before* anything is stored or sent to the AI.
+- Every API input is validated with Pydantic, with size limits. CORS is restricted, and security headers are set.
+- The AI sees only the evidence pack. Its answer must cite real evidence ids, and unsafe steps are blocked by the validator.
+- The containers run as a non-root user.
+
+## Demo script (about 5 minutes)
+
+1. **Simulator → Start traffic.** Healthy logs flow from 7 services in 3 formats (Overview, Live log stream).
+2. **Run "Payment DB connection pool exhausted".** About 10 s later an incident appears.
+3. **Open the incident:**
+   - The ranked candidates show payment-service on top, with a reason for each signal.
+   - The service graph runs gateway → checkout → payment, with payment as the origin.
+   - The code location is `payment/repository.py:24 charge_card`, a file changed in deployment v2.4.1.
+   - The recommended fix cites evidence such as E2 and E5.
+4. **Ask Gemini:** an AI recommendation, checked by the validator, with an expandable evidence pack.
+5. **Confirm root cause:** the weights change (see *Model & settings*). This is S8 learning.
+6. **Run "Brute-force login attack":** a critical security incident, because a login succeeded after 14 failures.
+7. **Run "Redis cache outage":** matched by the known-error playbook, so no AI call is needed.
+8. **Log explorer:** search `NullPointerException` and open an event to see the parsed Java stack and the masked raw input.
+
+## Sending real logs
+
+```bash
+curl -X POST http://localhost:8000/api/v1/ingest \
+  -H "X-API-Key: sla_demo_ingest_key" -H "Content-Type: application/json" \
+  -d '{"events": [{"level":"error","service":"billing","message":"Timeout calling ledger"}]}'
+
+python -m app.simulator.cli db_pool_exhaustion      # replays a scenario over HTTP like a log shipper
+```
+
+Interactive API documentation is at http://localhost:8000/docs.
+
+## Tests
+
+```bash
+cd backend && python -m pytest -q
+```
+
+The tests replay all four scenarios through the pipeline and assert the expected root cause, code
+location, deployment link, playbook match and security detection. They also cover authentication
+and the feedback-driven weight update.
+
+## Project layout
+
+```
+backend/
+  app/api/          REST endpoints (auth, ingest, events, incidents, system)
+  app/pipeline/     S2-S8 stages + worker
+  app/simulator/    ShopFlow failure scenarios, runner and CLI
+  sample_repo/      code snapshot used by the traceback stage
+  tests/
+frontend/src/       React + Vite + Tailwind dashboard
+docker-compose.yml  PostgreSQL, Redis, API, worker, Nginx
+```
+
+## Known limitations (prototype)
+- Tables are created at startup (`create_all`). Alembic migrations are the next step.
+- If a worker crashes, its unacknowledged Redis Stream messages are not reclaimed yet (`XAUTOCLAIM`).
+- Code analysis uses Python `ast` plus Java signature heuristics. Tree-sitter would add more languages.
+- `npm audit` reports a ReDoS advisory in `picomatch`, which is used only by the Vite build tooling. It is not part of the shipped bundle.
