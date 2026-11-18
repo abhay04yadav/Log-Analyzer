@@ -1,0 +1,33 @@
+# Render Blueprint: backend API (FastAPI) as one free web service.
+# Runs in "lite mode": SQLite + in-memory queue + pipeline worker inside the same process.
+# Note: on the free plan the disk is temporary, so stored logs/incidents reset on every
+# redeploy or restart, and the service sleeps after ~15 minutes without traffic.
+services:
+  - type: web
+    name: smart-log-analyzer-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10
+      - key: ENVIRONMENT
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        sync: false        # set in the Render dashboard
+      - key: INGEST_API_KEY
+        sync: false        # set in the Render dashboard
+      - key: GEMINI_API_KEY
+        sync: false        # set in the Render dashboard (optional; rules + playbooks work without it)
+      - key: CORS_ORIGINS
+        value: http://localhost:5173
+      - key: CORS_ORIGIN_REGEX
+        value: https://.*\.vercel\.app

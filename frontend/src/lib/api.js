@@ -1,6 +1,11 @@
 // Small fetch wrapper: adds the bearer token, parses JSON, signals logout on 401.
 const KEY = "sla_token";
 
+// Backend address. Empty in development (Vite proxies /api to localhost:8000);
+// set VITE_API_URL (e.g. https://smart-log-analyzer-api.onrender.com) when the
+// frontend is hosted separately, such as on Vercel.
+export const API_BASE = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+
 export function getToken() {
   try { return localStorage.getItem(KEY); } catch { return null; }
 }
@@ -12,7 +17,7 @@ export async function api(path, { method = "GET", body } = {}) {
   const headers = { "Content-Type": "application/json" };
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
-  const res = await fetch(path, { method, headers, body: body ? JSON.stringify(body) : undefined });
+  const res = await fetch(API_BASE + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
   if (res.status === 401 && !path.endsWith("/auth/login")) {
     setToken(null);
     window.dispatchEvent(new Event("sla-logout"));

@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import LiveTail from "../components/LiveTail.jsx";
 import UploadCard from "../components/UploadCard.jsx";
 import { Help, PageHeader } from "../components/ui.jsx";
-import { api } from "../lib/api.js";
+import { API_BASE, api } from "../lib/api.js";
 import { usePoll } from "../lib/usePoll.js";
 
 const ICONS = { db_pool_exhaustion: Database, inventory_null_pointer: Bug, cache_outage: ServerCrash, brute_force_login: KeyRound };
@@ -126,7 +126,7 @@ export default function Sources() {
 
 function ApiCard({ project }) {
   const [copied, setCopied] = useState(null);
-  const origin = window.location.origin;
+  const origin = API_BASE || window.location.origin;
   const key = project?.ingest_api_key || "…";
   const curl = `curl -X POST ${origin}/api/v1/ingest \\
   -H "X-API-Key: ${key}" \\

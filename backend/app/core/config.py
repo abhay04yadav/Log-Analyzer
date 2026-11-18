@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     admin_password: str = "admin123"
     token_ttl_minutes: int = 720
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+    cors_origin_regex: str | None = None  # e.g. https://.*\.vercel\.app for hosted frontends
 
     # default project (log sources send to it with this API key)
     project_name: str = "ShopFlow Production"

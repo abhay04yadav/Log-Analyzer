@@ -171,6 +171,24 @@ Sample log files are in `frontend/public/samples/`. The dashboard can also uploa
 
 Interactive API documentation is at http://localhost:8000/docs.
 
+## Deploying online (Render + Vercel)
+
+The backend runs on **Render** (free web service, lite mode) and the dashboard on **Vercel**.
+
+**1. Backend on Render**
+1. Render dashboard → **New → Blueprint** → connect this GitHub repository. Render reads `render.yaml`.
+2. Fill in the secret values it asks for: `ADMIN_PASSWORD` (a strong password), `INGEST_API_KEY` (any long random string) and `GEMINI_API_KEY` (optional).
+3. Deploy, then open `https://<your-service>.onrender.com/health`; it should return `{"status":"ok", ...}`.
+
+**2. Frontend on Vercel**
+1. Vercel → **Add New → Project** → import this repository, set **Root Directory** to `frontend` (framework: Vite).
+2. Add the environment variable `VITE_API_URL = https://<your-service>.onrender.com` (no trailing slash).
+3. Deploy. The site is at `https://<project>.vercel.app`; sign in with `admin` and your `ADMIN_PASSWORD`.
+
+CORS already accepts any `https://*.vercel.app` origin (`CORS_ORIGIN_REGEX`); for a custom domain add it to `CORS_ORIGINS` on Render.
+
+Free-plan notes: the Render service sleeps after about 15 minutes idle (first request then takes ~1 minute), and its disk is temporary, so logs and incidents reset on restart. Open the `/health` URL a minute before presenting. For persistent data, create a Render PostgreSQL database and set `DATABASE_URL` (`postgresql+psycopg://...`).
+
 ## Tests
 
 ```bash

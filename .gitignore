@@ -8,3 +8,5 @@ frontend/dist/
 
 # project documents (names / roll numbers) - kept out of the public repository
 updated/
+ui
+*.pptx
