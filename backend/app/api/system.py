@@ -1,4 +1,4 @@
-"""System status, ranking weights, playbook, simulator control and demo reset."""
+"""System status, ranking weights, playbook, failure drills (simulator) and data reset."""
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import delete, select, text
@@ -90,7 +90,7 @@ def traffic(action: str, db: Session = Depends(get_db)):
 
 @router.post("/admin/reset")
 def reset(db: Session = Depends(get_db)):
-    """Clear logs, incidents and learned weights (keeps project + playbook). Useful between demo runs."""
+    """Clear logs, incidents and learned weights (keeps project + playbook). Useful between presentations / test runs."""
     for model in (Feedback, Recommendation, Candidate):
         db.execute(delete(model))
     db.execute(delete(LogEvent))

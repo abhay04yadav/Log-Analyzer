@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import delete, select
 
 from app.api.ingest import store_deployment
+from app.core.config import get_settings
 from app.db import SessionLocal, init_db, utcnow
 from app.main import app
 from app.models import Candidate, Deployment, ErrorSignature, Feedback, Incident, LogEvent, Recommendation
@@ -109,7 +110,7 @@ def test_api_flow_and_feedback():
     h = {"Authorization": f"Bearer {tok}"}
     assert client.post("/api/v1/ingest", json={"events": ["x"]}).status_code == 401
     assert client.post("/api/v1/ingest", json={"events": ["hello"]},
-                       headers={"X-API-Key": "sla_demo_ingest_key"}).status_code == 202
+                       headers={"X-API-Key": get_settings().ingest_api_key}).status_code == 202
 
     inc = [i for i in play("db_pool_exhaustion") if i.category == "error"][0]
     d = client.get(f"/api/v1/incidents/{inc.id}", headers=h).json()
@@ -170,6 +171,6 @@ def test_file_upload_endpoint():
     assert client.post("/api/v1/upload", json={"content": sample}).status_code == 401
     r = client.post("/api/v1/upload", headers=h, json={"content": sample, "replay": True, "filename": "x.log"})
     assert r.status_code == 202 and r.json()["accepted"] > 100 and r.json()["replay_offset_seconds"] != 0
-    r = client.post("/api/v1/ingest/text", headers={"X-API-Key": "sla_demo_ingest_key"},
+    r = client.post("/api/v1/ingest/text", headers={"X-API-Key": get_settings().ingest_api_key},
                     json={"content": "2026-11-18 10:00:00 ERROR [svc] boom"})
     assert r.status_code == 202 and r.json()["accepted"] == 1

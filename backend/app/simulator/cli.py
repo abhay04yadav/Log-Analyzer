@@ -1,12 +1,13 @@
 """Standalone simulator: plays a scenario against the HTTP ingestion API (like a real log shipper).
 
-usage:  python -m app.simulator.cli db_pool_exhaustion [--url http://localhost:8000] [--key sla_demo_ingest_key]
+usage:  python -m app.simulator.cli db_pool_exhaustion [--url http://localhost:8000] [--key <INGEST_API_KEY>]
 """
 import argparse
 import time
 
 import httpx
 
+from app.core.config import get_settings
 from app.db import utcnow
 from app.simulator import scenarios
 
@@ -15,7 +16,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("scenario", choices=sorted(scenarios.GENERATORS))
     ap.add_argument("--url", default="http://localhost:8000")
-    ap.add_argument("--key", default="sla_demo_ingest_key")
+    ap.add_argument("--key", default=get_settings().ingest_api_key)
     args = ap.parse_args()
 
     headers = {"X-API-Key": args.key}

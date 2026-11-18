@@ -24,9 +24,9 @@ class Settings(BaseSettings):
     token_ttl_minutes: int = 720
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
 
-    # default project used by the demo + simulator
-    demo_project_name: str = "ShopFlow (demo)"
-    demo_api_key: str = "sla_demo_ingest_key"
+    # default project (log sources send to it with this API key)
+    project_name: str = "ShopFlow Production"
+    ingest_api_key: str = "sla_live_change_me"
 
     # AI provider (S7). Without a key the system still works: playbooks + rule-based recommendations.
     llm_provider: str = "gemini"

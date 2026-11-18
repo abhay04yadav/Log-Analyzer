@@ -19,16 +19,16 @@ export default function EventModal({ id, onClose }) {
   if (!id) return null;
 
   const fields = e && !e.error ? [
-    ["Timestamp", fmtDateTime(e.ts)], ["Service", e.service], ["Logger", e.logger], ["Format", e.format],
-    ["Trace", e.trace_id], ["Span", e.span_id], ["Parent span", e.parent_span_id], ["Error type", e.error_type],
-    ["Fingerprint", e.fingerprint], ["Incident", e.incident_id && `#${e.incident_id}`],
+    ["Timestamp", fmtDateTime(e.ts)], ["Service", e.service], ["Logger", e.logger], ["Original format", e.format],
+    ["Request ID", e.trace_id], ["Step ID", e.span_id], ["Called by step", e.parent_span_id], ["Error type", e.error_type],
+    ["Error signature", e.fingerprint], ["Incident", e.incident_id && `#${e.incident_id}`],
   ].filter(([, v]) => v) : [];
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-auto bg-slate-900/40 p-4 pt-16" onClick={onClose}>
       <div className="card w-full max-w-3xl" onClick={(ev) => ev.stopPropagation()}>
         <div className="card-h">
-          <div className="card-t">Event #{id} {e?.level && <LevelBadge level={e.level} />}</div>
+          <div className="card-t">Log entry #{id} {e?.level && <LevelBadge level={e.level} />}</div>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-700" aria-label="Close"><X size={18} /></button>
         </div>
         {!e && <div className="p-6 text-sm text-slate-400">Loading…</div>}
@@ -37,12 +37,12 @@ export default function EventModal({ id, onClose }) {
             <div className="mono rounded-lg bg-slate-50 p-3 text-slate-800">{e.message}</div>
             <div className="grid grid-cols-1 gap-x-6 gap-y-1.5 text-xs sm:grid-cols-2">
               {fields.map(([k, v]) => (
-                <div key={k} className="flex gap-2"><span className="w-24 shrink-0 text-slate-400">{k}</span><span className="mono truncate text-slate-700">{v}</span></div>
+                <div key={k} className="flex gap-2"><span className="w-28 shrink-0 text-slate-400">{k}</span><span className="mono truncate text-slate-700">{v}</span></div>
               ))}
             </div>
             {e.stack?.length > 0 && (
               <div>
-                <div className="mb-1 text-xs font-semibold text-slate-500">Parsed stack frames (innermost first)</div>
+                <div className="mb-1 text-xs font-semibold text-slate-500">Where in the code (innermost call first)</div>
                 <div className="space-y-1">
                   {e.stack.map((f, i) => (
                     <div key={i} className="mono flex flex-wrap gap-2 text-slate-600">
@@ -54,7 +54,7 @@ export default function EventModal({ id, onClose }) {
             )}
             {e.attrs && Object.keys(e.attrs).length > 0 && (
               <div>
-                <div className="mb-1 text-xs font-semibold text-slate-500">Attributes</div>
+                <div className="mb-1 text-xs font-semibold text-slate-500">Extra fields</div>
                 <div className="flex flex-wrap gap-1.5">{Object.entries(e.attrs).map(([k, v]) => <Pill key={k}>{k}={String(v)}</Pill>)}</div>
               </div>
             )}
@@ -65,7 +65,7 @@ export default function EventModal({ id, onClose }) {
               </div>
             )}
             <div>
-              <div className="mb-1 text-xs font-semibold text-slate-500">Original input ({e.format}, secrets masked)</div>
+              <div className="mb-1 text-xs font-semibold text-slate-500">Original log line as received (passwords and keys are hidden)</div>
               <pre className="mono max-h-48 overflow-auto rounded-lg bg-slate-100 p-3 whitespace-pre-wrap break-all text-slate-700">{e.raw}</pre>
             </div>
           </div>

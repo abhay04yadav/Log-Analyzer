@@ -1,4 +1,4 @@
-"""Export a simulator scenario as a plain log file (for the upload feature and offline demos).
+"""Export a simulator scenario as a plain log file (sample files for the upload feature).
 
 usage:  python -m app.simulator.export cache_outage ../frontend/public/samples/shopflow-cache-outage.log
 """

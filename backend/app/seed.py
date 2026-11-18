@@ -1,4 +1,4 @@
-"""Initial data: demo project + known-error playbook + default ranking weights."""
+"""Initial data: default project + known-error playbook + default ranking weights."""
 from sqlalchemy import select
 
 from app.core.config import get_settings
@@ -48,8 +48,12 @@ PLAYBOOK = [
 def seed() -> None:
     s = get_settings()
     with SessionLocal() as db:
-        if not db.scalar(select(Project).limit(1)):
-            db.add(Project(name=s.demo_project_name, api_key_hash=hash_api_key(s.demo_api_key)))
+        project = db.scalar(select(Project).order_by(Project.id).limit(1))
+        if not project:
+            db.add(Project(name=s.project_name, api_key_hash=hash_api_key(s.ingest_api_key)))
+        else:                                   # keep name / key in sync with the configuration
+            project.name = s.project_name
+            project.api_key_hash = hash_api_key(s.ingest_api_key)
         existing = {k.name for k in db.scalars(select(KnownError))}
         for p in PLAYBOOK:
             if p["name"] not in existing:

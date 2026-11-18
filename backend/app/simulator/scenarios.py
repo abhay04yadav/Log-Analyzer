@@ -1,4 +1,4 @@
-"""Realistic log generator for the "ShopFlow" demo system.
+"""Realistic log generator for the "ShopFlow" e-commerce system.
 
 Services:  api-gateway -> checkout-service -> payment-service
            api-gateway -> order-service -> inventory-service (Java)
@@ -20,23 +20,23 @@ from app.core.config import get_settings
 
 SCENARIOS = {
     "db_pool_exhaustion": {
-        "title": "Payment DB connection pool exhausted after deployment",
-        "description": "payment-service v2.4.1 leaks DB connections; checkout and the gateway start failing.",
+        "title": "Payment database overloaded after a new release",
+        "description": "A new version of the payment service does not close its database connections. Payments fail, and the failure spreads to checkout and the website.",
         "expected_root_cause": "payment-service: QueuePool exhausted in payment/repository.py charge_card",
     },
     "inventory_null_pointer": {
-        "title": "Java NullPointerException in inventory-service",
-        "description": "inventory-service v1.8.0 has no warehouse for region ap-south-2; orders fail.",
+        "title": "Bug in the inventory service (Java crash)",
+        "description": "A new inventory release crashes when an order comes from a region with no warehouse configured, so those orders fail.",
         "expected_root_cause": "inventory-service: NullPointerException in StockService.reserve",
     },
     "cache_outage": {
-        "title": "Redis cache outage (known error)",
-        "description": "cart-service cannot reach Redis; matched by the known-error playbook.",
+        "title": "Cache server goes down (known issue)",
+        "description": "The shopping-cart service loses its connection to the Redis cache. This problem is already in the known issues library, so the fix comes straight from it.",
         "expected_root_cause": "cart-service: Redis connection refused",
     },
     "brute_force_login": {
-        "title": "Brute-force login attack",
-        "description": "Repeated failed logins from one IP, followed by a successful login.",
+        "title": "Password-guessing attack",
+        "description": "Someone tries many passwords from one IP address and finally gets in. Shows security detection.",
         "expected_root_cause": "203.0.113.45 guessing passwords on auth-service",
     },
 }

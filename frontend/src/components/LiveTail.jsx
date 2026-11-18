@@ -29,13 +29,16 @@ export default function LiveTail({ max = 60 }) {
   return (
     <div className="card flex flex-col">
       <div className="card-h">
-        <div className="card-t"><ScrollText size={16} /> Live log stream
-          {!paused && <span className="ml-1 flex items-center gap-1 text-[11px] font-normal text-emerald-600"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> live</span>}
+        <div>
+          <div className="card-t"><ScrollText size={16} /> Live log stream
+            {!paused && <span className="ml-1 flex items-center gap-1 text-[11px] font-medium text-emerald-600"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> Live</span>}
+          </div>
+          <div className="card-d">Newest logs from all services, as they arrive</div>
         </div>
-        <button className="btn-ghost !py-1 !text-xs" onClick={() => setPaused((p) => !p)}>{paused ? <><Play size={13} /> Resume</> : <><Pause size={13} /> Pause</>}</button>
+        <button className="btn-ghost btn-sm" onClick={() => setPaused((p) => !p)}>{paused ? <><Play size={13} /> Resume</> : <><Pause size={13} /> Pause</>}</button>
       </div>
-      <div className="max-h-[360px] min-h-[200px] overflow-auto">
-        {items.length === 0 && <Empty>Waiting for logs…</Empty>}
+      <div className="max-h-[380px] min-h-[220px] overflow-auto">
+        {items.length === 0 && <Empty icon={ScrollText} title="Waiting for logs">New log lines will appear here in real time.</Empty>}
         {items.map((e) => (
           <div key={e.id} className={`flex items-start gap-2 border-b border-slate-50 px-3 py-1.5 ${e.is_error ? "bg-rose-50/40" : ""}`}>
             <span className="mono shrink-0 pt-0.5 text-slate-400">{fmtTime(e.ts)}</span>

@@ -25,7 +25,7 @@ npm run dev                     # http://localhost:5173   login: admin / admin12
 ```
 
 Without `DATABASE_URL` and `REDIS_URL` the backend uses a local SQLite file and an in-memory queue,
-so the demo runs on any laptop. Without `GEMINI_API_KEY`, recommendations come from the known-error
+so it runs on any laptop. Without `GEMINI_API_KEY`, recommendations come from the known-error
 playbook and rule-based guidance.
 
 ## Full stack (Docker)
@@ -132,39 +132,42 @@ The data is synthetic, so real-world accuracy will be lower. The ablation shows 
 - The AI sees only the evidence pack. Its answer must cite real evidence ids, and unsafe steps are blocked by the validator.
 - The containers run as a non-root user.
 
-## Demo script (about 5 minutes)
+## Presentation walkthrough (about 5 minutes)
 
-1. **Simulator → Start traffic.** Healthy logs flow from 7 services in 3 formats (Overview, Live log stream).
-2. **Run "Payment DB connection pool exhausted".** About 10 s later an incident appears.
-3. **Open the incident:**
-   - The ranked candidates show payment-service on top, with a reason for each signal.
-   - The service graph runs gateway → checkout → payment, with payment as the origin.
-   - The code location is `payment/repository.py:24 charge_card`, a file changed in deployment v2.4.1.
-   - The recommended fix cites evidence such as E2 and E5.
-4. **Ask Gemini:** an AI recommendation, checked by the validator, with an expandable evidence pack.
-5. **Confirm root cause:** the weights change (see *Model & settings*). This is S8 learning.
-6. **Run "Brute-force login attack":** a critical security incident, because a login succeeded after 14 failures.
-7. **Run "Redis cache outage":** matched by the known-error playbook, so no AI call is needed.
-8. **Log explorer:** search `NullPointerException` and open an event to see the parsed Java stack and the masked raw input.
-9. **Upload a log file** (Simulator page → Samples → "Java NullPointerException" → Ingest). A plain log file becomes an incident.
-10. **History:** run the payment scenario again after confirming it. The new incident shows "Similar past incidents" with the earlier fix, and its confidence rises.
+1. **Log sources → Start live traffic.** Normal logs flow from 7 services in 3 formats (see Overview and the live log stream).
+2. **Start the drill "Payment database overloaded after a new release".** About 10 s later an incident appears.
+3. **Open the incident.** The *Summary* answers four questions: what happened, where it started, why we think so, and how to fix it.
+   - *Root cause* tab: ranked suspects with payment-service on top, and a plain-language reason for each of the five clues.
+   - *Service map & code* tab: gateway → checkout → payment, with payment as the starting point. The code line is `payment/repository.py` `charge_card`, a file changed in release v2.4.1.
+   - *Recommended fix* tab: fix steps that cite evidence (E2, E5, …), marked "Verified against evidence".
+4. **Ask AI again:** Gemini writes the recommendation from the evidence only; expand "Evidence used" to show what it saw.
+5. **Answer "Yes" to "Is this correct?"** The clue weights change (see *Settings → What the analyzer has learned*). This is S8 learning.
+6. **Drill "Password-guessing attack":** a security incident, raised to critical because a login succeeded after 14 failures.
+7. **Drill "Cache server goes down":** matched by the known issues library, so no AI call is needed.
+8. **Log search:** search `NullPointerException` and open a line to see the parsed Java stack and the original (masked) log line.
+9. **Upload a log file** (Log sources → "Inventory crash (Java)" sample → Analyse file). A plain log file becomes an incident.
+10. **History:** run the payment drill again after confirming it. The new incident's *History & feedback* tab shows the earlier incident and its fix, and its confidence rises.
+
+The **How it works** page in the app explains the nine processing steps, the five clues and a glossary in plain language.
 
 ## Sending real logs
 
+The project API key is `INGEST_API_KEY` in `backend/.env`; it is also shown on the *Log sources* page.
+
 ```bash
 curl -X POST http://localhost:8000/api/v1/ingest \
-  -H "X-API-Key: sla_demo_ingest_key" -H "Content-Type: application/json" \
+  -H "X-API-Key: $INGEST_API_KEY" -H "Content-Type: application/json" \
   -d '{"events": [{"level":"error","service":"billing","message":"Timeout calling ledger"}]}'
 
 python -m app.simulator.cli db_pool_exhaustion      # replays a scenario over HTTP like a log shipper
 
 # a whole log file (JSON lines / logfmt / text with multi-line stack traces)
 python -c "import json,sys;print(json.dumps({'content':open(sys.argv[1]).read(),'replay':True}))" app.log \
-  | curl -X POST http://localhost:8000/api/v1/ingest/text -H "X-API-Key: sla_demo_ingest_key" \
+  | curl -X POST http://localhost:8000/api/v1/ingest/text -H "X-API-Key: $INGEST_API_KEY" \
          -H "Content-Type: application/json" -d @-
 ```
 
-Sample log files are in `frontend/public/samples/`. The dashboard can also upload files (Simulator page).
+Sample log files are in `frontend/public/samples/`. The dashboard can also upload files (Log sources page).
 
 Interactive API documentation is at http://localhost:8000/docs.
 

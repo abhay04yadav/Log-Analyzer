@@ -28,8 +28,8 @@ from app.pipeline.traceback import build_graph, code_location, reachable_upstrea
 
 settings = get_settings()
 DEFAULT_WEIGHTS = {"T": 0.25, "D": 0.25, "A": 0.15, "C": 0.20, "H": 0.15}
-SIGNAL_NAMES = {"T": "Temporal precedence", "D": "Dependency position", "A": "Anomaly",
-                "C": "Code & deployment", "H": "History"}
+SIGNAL_NAMES = {"T": "Happened first", "D": "Position in call chain", "A": "Unusual volume",
+                "C": "Code & recent changes", "H": "Seen before"}
 
 
 def get_weights(db: Session) -> dict:
@@ -135,7 +135,7 @@ def _error_candidates(db, incident, errors, graph, known) -> list[dict]:
         # T - temporal precedence
         dt = (first - t0).total_seconds()
         T = math.exp(-dt / 5.0)
-        reasons["T"] = "first error in the incident" if dt == 0 else f"appeared {_fmt_dt(dt)} after the first error"
+        reasons["T"] = "this was the very first error" if dt == 0 else f"started {_fmt_dt(dt)} after the first error"
 
         # D - position in the dependency graph + blast radius
         node = nodes.get(service, {})
@@ -143,10 +143,10 @@ def _error_candidates(db, incident, errors, graph, known) -> list[dict]:
         failing_down = [d for d in node.get("downstream", []) if nodes.get(d, {}).get("errors")]
         leaf = 1.0 if not failing_down else 0.2
         D = 0.7 * leaf + 0.3 * min(1.0, len(impacted) / n_services)
-        reasons["D"] = ("deepest failing service (no failing dependency)" if not failing_down
-                        else f"depends on failing {', '.join(failing_down)}")
+        reasons["D"] = ("nothing it depends on is failing, so the problem starts here" if not failing_down
+                        else f"it calls {', '.join(failing_down)}, which is also failing")
         if impacted:
-            reasons["D"] += f"; impacts {', '.join(sorted(impacted))}"
+            reasons["D"] += f"; it affects {', '.join(sorted(impacted))}"
 
         # A - anomaly vs own baseline
         baseline = db.scalar(select(func.count()).where(
@@ -155,8 +155,8 @@ def _error_candidates(db, incident, errors, graph, known) -> list[dict]:
         expected = baseline * (span / 1800.0)
         ratio = len(evs) / (expected + 1.0)
         A = min(1.0, math.log2(1 + ratio) / math.log2(1 + 20))
-        reasons["A"] = (f"{len(evs)} occurrences, new failure (no baseline)" if baseline == 0
-                        else f"{len(evs)} occurrences vs ~{expected:.1f} expected ({ratio:.1f}x)")
+        reasons["A"] = (f"{len(evs)} times; this error did not happen before" if baseline == 0
+                        else f"{len(evs)} times vs about {expected:.1f} normally ({ratio:.1f}x more)")
 
         # C - code location + deployment proximity
         loc = code_location(service, rep.stack)
@@ -166,34 +166,34 @@ def _error_candidates(db, incident, errors, graph, known) -> list[dict]:
         C, why = 0.0, []
         if loc and loc.get("resolved"):
             C += 0.3
-            why.append(f"stack resolved to {loc['repo_path']}:{loc['line']} ({loc['function']})")
+            why.append(f"error points to {loc['repo_path']} line {loc['line']} ({loc['function']})")
         elif loc:
             C += 0.1
-            why.append(f"stack frame {loc['file']}:{loc['line']} (not in repository snapshot)")
+            why.append(f"error points to {loc['file']} line {loc['line']} (file not in the code repository)")
         if deploy:
             mins = (first - deploy.ts).total_seconds() / 60
             C += 0.4
-            why.append(f"{service} {deploy.version} deployed {mins:.0f} min before")
+            why.append(f"new version {deploy.version} of {service} was released {mins:.0f} min earlier")
             changed = [f.replace("\\", "/") for f in (deploy.changed_files or [])]
             if loc and loc.get("resolved") and any(loc["repo_path"].endswith(f) or f.endswith(loc["repo_path"])
                                                    for f in changed):
                 C += 0.3
-                why.append("failing file was changed in that deployment")
+                why.append("and the failing file was changed in that release")
                 loc["changed_in_deployment"] = deploy.version
         C = min(1.0, C)
-        reasons["C"] = "; ".join(why) or "no code location or recent change"
+        reasons["C"] = "; ".join(why) or "no code location and no recent release"
 
         # H - history
         k = match_known(known, rep.error_type, rep.message)
         sig = db.get(ErrorSignature, fp) if fp else None
         if k:
-            H, reasons["H"] = 1.0, f"matches known error: {k.name}"
+            H, reasons["H"] = 1.0, f"matches a known issue: {k.name}"
         elif sig and sig.confirmed_root_cause:
-            H, reasons["H"] = 0.8, f"confirmed as root cause {sig.confirmed_root_cause}x before"
+            H, reasons["H"] = 0.8, f"confirmed as the root cause {sig.confirmed_root_cause} time(s) before"
         elif sig and sig.first_seen < incident.window_start - timedelta(minutes=10):
-            H, reasons["H"] = 0.2, "seen before, never confirmed as a root cause"
+            H, reasons["H"] = 0.2, "seen before, but never confirmed as a root cause"
         else:
-            H, reasons["H"] = 0.0, "no history"
+            H, reasons["H"] = 0.0, "never seen before"
         cand_key = {"service": service, "fingerprint": fp, "error_type": rep.error_type, "message": rep.message}
         similar = find_similar(db, incident, cand_key)
         if similar and not k:
@@ -201,7 +201,7 @@ def _error_candidates(db, incident, errors, graph, known) -> list[dict]:
             h_sim = round(0.9 * s["similarity"], 3)
             if h_sim >= H:
                 H = h_sim
-                reasons["H"] = (f"similar to confirmed incident #{s['incident_id']} "
+                reasons["H"] = (f"looks like past incident #{s['incident_id']} "
                                 f"(similarity {s['similarity']:.2f}"
                                 + (f", fixed by: {s['fix']}" if s.get("fix") else "") + ")")
 
@@ -234,13 +234,13 @@ def _security_candidates(db, incident, events, known) -> list[dict]:
     k = next((x for x in known if x.category == "security"), None)
     rate = len(fails) / span * 60
     reasons = {
-        "T": "first suspicious event of the incident; failures continued for "
-             f"{span:.0f} s",
+        "T": "the first suspicious event; failed logins continued for "
+             f"{span:.0f} seconds",
         "D": f"targets {fails[0].service}" + (f"; accounts tried: {', '.join(users)}" if users else ""),
-        "A": f"{len(fails)} failures in {span:.0f} s ({rate:.0f}/min) from one source",
-        "C": ("successful login from the same source after the failures - possible compromise"
-              if success else "no successful login from this source"),
-        "H": f"matches known pattern: {k.name}" if k else "no history",
+        "A": f"{len(fails)} failed logins in {span:.0f} seconds ({rate:.0f} per minute) from one address",
+        "C": ("a login from the same address then SUCCEEDED - the account may be compromised"
+              if success else "no successful login from this address"),
+        "H": f"matches a known issue: {k.name}" if k else "never seen before",
     }
     return [dict(service=fails[0].service, fingerprint=None, error_type="Repeated authentication failures",
                  message=f"{len(fails)} failed logins from {ip}", reasons=reasons,

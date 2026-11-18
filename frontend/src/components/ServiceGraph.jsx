@@ -3,14 +3,14 @@
 export default function ServiceGraph({ graph, highlight }) {
   const nodes = graph?.nodes || [];
   const edges = graph?.edges || [];
-  if (!nodes.length) return <div className="py-8 text-center text-sm text-slate-400">No trace data.</div>;
+  if (!nodes.length) return <div className="py-8 text-center text-sm text-slate-400">No request tracing data in these logs.</div>;
 
-  const W = 168, H = 50, GX = 24, GY = 46;
+  const W = 200, H = 50, GX = 24, GY = 46, PAD = 120;
   const rows = {};
   nodes.forEach((n) => { (rows[n.depth] ||= []).push(n); });
   const depths = Object.keys(rows).map(Number).sort((a, b) => a - b);
   const maxCols = Math.max(...depths.map((d) => rows[d].length));
-  const width = 20 + maxCols * W + (maxCols - 1) * GX;
+  const width = 2 * PAD + maxCols * W + (maxCols - 1) * GX;
   const pos = {};
   depths.forEach((d, ri) => {
     const row = rows[d];
@@ -54,7 +54,7 @@ export default function ServiceGraph({ graph, highlight }) {
             <circle cx={p.x + 14} cy={p.y + 18} r="5" fill={bad ? "#e11d48" : "#10b981"} />
             <text x={p.x + 26} y={p.y + 22} fontSize="13" fontWeight="600" fill="#1e293b">{n.id.length > 18 ? n.id.slice(0, 17) + "…" : n.id}</text>
             <text x={p.x + 12} y={p.y + 40} fontSize="11" fill={bad ? "#be123c" : "#64748b"}>
-              {n.events} ev · {n.errors} err{n.origin && bad ? " · origin" : ""}
+              {n.errors ? `${n.errors} errors` : "healthy"} · {n.events} logs{n.origin && bad ? " · starts here" : ""}
             </text>
           </g>
         );

@@ -114,3 +114,13 @@ def create_deployment(body: DeploymentRequest, project: Project = Depends(projec
     if not dep.ts:
         raise HTTPException(400, "invalid timestamp")
     return {"id": dep.id}
+
+
+@router.get("/project")
+def project_info(_: str = Depends(current_user), db: Session = Depends(get_db)):
+    """Project details for the 'Log sources' page (signed-in users only)."""
+    p = db.scalar(select(Project).order_by(Project.id).limit(1))
+    return {"id": p.id if p else None, "name": p.name if p else settings.project_name,
+            "ingest_api_key": settings.ingest_api_key,
+            "endpoints": {"events": "/api/v1/ingest", "file": "/api/v1/ingest/text",
+                          "deployments": "/api/v1/deployments"}}

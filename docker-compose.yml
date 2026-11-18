@@ -31,7 +31,7 @@ services:
       SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
       ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
-      DEMO_API_KEY: ${DEMO_API_KEY:-sla_demo_ingest_key}
+      INGEST_API_KEY: ${INGEST_API_KEY:-sla_live_change_me}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.5-flash-lite}
       CORS_ORIGINS: http://localhost:8080

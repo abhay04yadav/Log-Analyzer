@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout.jsx";
 import { getToken } from "./lib/api.js";
+import Guide from "./pages/Guide.jsx";
 import IncidentDetail from "./pages/IncidentDetail.jsx";
 import Incidents from "./pages/Incidents.jsx";
 import Login from "./pages/Login.jsx";
 import Logs from "./pages/Logs.jsx";
 import Overview from "./pages/Overview.jsx";
 import Settings from "./pages/Settings.jsx";
-import Simulator from "./pages/Simulator.jsx";
+import Sources from "./pages/Sources.jsx";
 
 export default function App() {
   const [authed, setAuthed] = useState(!!getToken());
@@ -27,8 +28,10 @@ export default function App() {
         <Route path="incidents" element={<Incidents />} />
         <Route path="incidents/:id" element={<IncidentDetail />} />
         <Route path="logs" element={<Logs />} />
-        <Route path="simulator" element={<Simulator />} />
+        <Route path="sources" element={<Sources />} />
+        <Route path="simulator" element={<Navigate to="/sources" replace />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="guide" element={<Guide />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

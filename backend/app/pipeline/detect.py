@@ -75,7 +75,7 @@ def detect(db: Session, project_id: int, events: list[LogEvent], known: list[Kno
         if k:
             out.append(Detection("known", "error", f"Known error: {k.name}", [e.id], e.fingerprint, k.id, k.severity))
         elif e.level == "CRITICAL":
-            out.append(Detection("critical", "error", f"Critical event in {e.service}", [e.id], e.fingerprint,
+            out.append(Detection("critical", "error", f"Critical error in {e.service}", [e.id], e.fingerprint,
                                  severity="high"))
 
     # rate spike per fingerprint (compared with the fingerprint's own baseline)
@@ -93,7 +93,8 @@ def detect(db: Session, project_id: int, events: list[LogEvent], known: list[Kno
         per_min = baseline / (BASELINE_WINDOW / SPIKE_WINDOW)
         if recent >= 3 and recent > 3 * per_min + 2:
             out.append(Detection("spike", "error",
-                                 f"Error spike in {evs[0].service}: {recent}/min vs baseline {per_min:.1f}/min",
+                                 f"Errors jumped in {evs[0].service}: {recent} per minute "
+                                 + (f"(normally {per_min:.1f})" if per_min else "(normally none)"),
                                  [e.id for e in evs], fp, severity="high" if recent >= 10 else "medium"))
 
     # security: repeated authentication failures from one source
@@ -109,7 +110,7 @@ def detect(db: Session, project_id: int, events: list[LogEvent], known: list[Kno
         hits = [w for w in window if is_auth_failure(w) and source_ip(w) == ip]
         if len(hits) >= SECURITY_THRESHOLD:
             out.append(Detection("security", "security",
-                                 f"{len(hits)} authentication failures from {ip} within "
-                                 f"{int(SECURITY_WINDOW.total_seconds())}s",
+                                 f"{len(hits)} failed logins from {ip} within "
+                                 f"{int(SECURITY_WINDOW.total_seconds())} seconds",
                                  [h.id for h in hits], severity="high", group_key=ip))
     return out
