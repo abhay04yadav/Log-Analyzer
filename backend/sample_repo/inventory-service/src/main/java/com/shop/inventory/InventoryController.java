@@ -2,6 +2,7 @@ package com.shop.inventory;
 
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping("/inventory")
 public class InventoryController {
