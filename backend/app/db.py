@@ -12,13 +12,15 @@ settings = get_settings()
 # Hosted providers (e.g. Render) give "postgres://" or "postgresql://" URLs; use the psycopg 3 driver.
 DATABASE_URL = settings.database_url.replace("postgres://", "postgresql://", 1)
 if DATABASE_URL.startswith("postgresql://"):
-    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
+    DATABASE_URL = DATABASE_URL.replace(
+        "postgresql://", "postgresql+psycopg://", 1)
 IS_SQLITE = DATABASE_URL.startswith("sqlite")
 IS_POSTGRES = DATABASE_URL.startswith("postgresql")
 
 engine = create_engine(
     DATABASE_URL,
-    connect_args={"check_same_thread": False, "timeout": 30} if IS_SQLITE else {},
+    connect_args={"check_same_thread": False,
+                  "timeout": 30} if IS_SQLITE else {},
     pool_pre_ping=True,
 )
 

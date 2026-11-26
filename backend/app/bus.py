@@ -3,6 +3,7 @@
 The ingestion API only validates and publishes; processing happens in the worker, so bursts of
 logs never block producers and the worker can be scaled out (more consumers in the same group).
 """
+
 import json
 import logging
 import queue
@@ -22,7 +23,8 @@ class EventBus(ABC):
     def publish(self, stream: str, payload: dict) -> str: ...
 
     @abstractmethod
-    def read(self, stream: str, consumer: str, count: int = 50, block_ms: int = 1000) -> list[tuple[str, dict]]: ...
+    def read(self, stream: str, consumer: str, count: int = 50,
+             block_ms: int = 1000) -> list[tuple[str, dict]]: ...
 
     def ack(self, stream: str, ids: list[str]) -> None:  # noqa: B027
         pass
@@ -70,7 +72,8 @@ class RedisStreamsBus(EventBus):
     def __init__(self, url: str):
         import redis
 
-        self.r = redis.Redis.from_url(url, decode_responses=True, socket_timeout=10)
+        self.r = redis.Redis.from_url(
+            url, decode_responses=True, socket_timeout=10)
         self.r.ping()
         self._groups: set[str] = set()
 
@@ -89,7 +92,8 @@ class RedisStreamsBus(EventBus):
 
     def read(self, stream, consumer, count=50, block_ms=1000):
         self._ensure_group(stream)
-        resp = self.r.xreadgroup(GROUP, consumer, {stream: ">"}, count=count, block=block_ms)
+        resp = self.r.xreadgroup(
+            GROUP, consumer, {stream: ">"}, count=count, block=block_ms)
         return [(mid, json.loads(fields["data"])) for _, msgs in (resp or []) for mid, fields in msgs]
 
     def ack(self, stream, ids):
@@ -119,7 +123,8 @@ def get_bus() -> EventBus:
                 _bus = RedisStreamsBus(url)
                 log.info("event bus: Redis Streams at %s", url)
             except Exception as e:
-                log.warning("Redis unavailable (%s) -- falling back to in-memory queue", e)
+                log.warning(
+                    "Redis unavailable (%s) -- falling back to in-memory queue", e)
         if _bus is None:
             _bus = MemoryBus()
             log.info("event bus: in-memory queue (lite mode)")

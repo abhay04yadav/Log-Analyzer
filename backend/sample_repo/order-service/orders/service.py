@@ -8,6 +8,7 @@ class InventoryReservationError(Exception):
     pass
 
 
+
 def create_order(order: dict) -> dict:
     for item in order["items"]:
         r = httpx.post(INVENTORY_URL, json={"sku": item["sku"], "quantity": item["qty"],

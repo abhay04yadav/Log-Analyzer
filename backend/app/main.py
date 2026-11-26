@@ -12,7 +12,8 @@ from app.db import init_db
 from app.pipeline.processor import Worker
 from app.seed import seed
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+logging.basicConfig(level=logging.INFO,
+                    format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 settings = get_settings()
 
 
@@ -25,7 +26,8 @@ async def lifespan(app: FastAPI):
     if worker:
         worker.start()
     if not settings.llm_enabled:
-        logging.getLogger("sla").warning("GEMINI_API_KEY not set: recommendations use playbooks + rules only")
+        logging.getLogger("sla").warning(
+            "GEMINI_API_KEY not set: recommendations use playbooks + rules only")
     yield
     if worker:
         worker.shutdown()
